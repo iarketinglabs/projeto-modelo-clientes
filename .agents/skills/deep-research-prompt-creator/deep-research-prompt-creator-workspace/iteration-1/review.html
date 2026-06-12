@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eval Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg: #faf9f5;
+      --surface: #ffffff;
+      --border: #e8e6dc;
+      --text: #141413;
+      --text-muted: #b0aea5;
+      --accent: #d97757;
+      --accent-hover: #c4613f;
+      --green: #788c5d;
+      --green-bg: #eef2e8;
+      --red: #c44;
+      --red-bg: #fceaea;
+      --header-bg: #141413;
+      --header-text: #faf9f5;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .header .instructions {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+    .header .progress {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      text-align: right;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ---- Sections ---- */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      flex-shrink: 0;
+    }
+    .section-header {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .section-body {
+      padding: 1rem;
+    }
+
+    /* ---- Config badge ---- */
+    .config-badge {
+      display: inline-block;
+      padding: 0.2rem 0.625rem;
+      border-radius: 9999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-left: 0.75rem;
+      vertical-align: middle;
+    }
+    .config-badge.config-primary {
+      background: rgba(33, 150, 243, 0.12);
+      color: #1976d2;
+    }
+    .config-badge.config-baseline {
+      background: rgba(255, 193, 7, 0.15);
+      color: #f57f17;
+    }
+
+    /* ---- Prompt ---- */
+    .prompt-text {
+      white-space: pre-wrap;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* ---- Outputs ---- */
+    .output-file {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .output-file + .output-file {
+      margin-top: 1rem;
+    }
+    .output-file-header {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-file-header .dl-btn {
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+    .output-file-header .dl-btn:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    .output-file-content {
+      padding: 0.75rem;
+      overflow-x: auto;
+    }
+    .output-file-content pre {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+    .output-file-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    .output-file-content iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+    .output-file-content table {
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      width: 100%;
+    }
+    .output-file-content table td,
+    .output-file-content table th {
+      border: 1px solid var(--border);
+      padding: 0.375rem 0.5rem;
+      text-align: left;
+    }
+    .output-file-content table th {
+      background: var(--bg);
+      font-weight: 600;
+    }
+    .output-file-content .download-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .output-file-content .download-link:hover {
+      background: var(--border);
+    }
+    .empty-state {
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* ---- Feedback ---- */
+    .prev-feedback {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.625rem 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .prev-feedback-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+    .feedback-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      resize: vertical;
+      color: var(--text);
+    }
+    .feedback-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .feedback-status {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      min-height: 1.1em;
+    }
+
+    /* ---- Grades (collapsible) ---- */
+    .grades-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .grades-toggle:hover {
+      color: var(--accent);
+    }
+    .grades-toggle .arrow {
+      margin-right: 0.5rem;
+      transition: transform 0.15s;
+      font-size: 0.75rem;
+    }
+    .grades-toggle .arrow.open {
+      transform: rotate(90deg);
+    }
+    .grades-content {
+      display: none;
+      margin-top: 0.75rem;
+    }
+    .grades-content.open {
+      display: block;
+    }
+    .grades-summary {
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .grade-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .grade-pass { background: var(--green-bg); color: var(--green); }
+    .grade-fail { background: var(--red-bg); color: var(--red); }
+    .assertion-list {
+      list-style: none;
+    }
+    .assertion-item {
+      padding: 0.625rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8125rem;
+    }
+    .assertion-item:last-child { border-bottom: none; }
+    .assertion-status {
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+    .assertion-status.pass { color: var(--green); }
+    .assertion-status.fail { color: var(--red); }
+    .assertion-evidence {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      padding-left: 1.5rem;
+    }
+
+    /* ---- View tabs ---- */
+    .view-tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .view-tab {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .view-tab:hover { color: var(--text); }
+    .view-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .view-panel { display: none; }
+    .view-panel.active { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+    /* ---- Benchmark view ---- */
+    .benchmark-view {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .benchmark-table {
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.8125rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    .benchmark-table th, .benchmark-table td {
+      padding: 0.625rem 0.75rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    .benchmark-table th {
+      font-family: 'Poppins', sans-serif;
+      background: var(--header-bg);
+      color: var(--header-text);
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .benchmark-table tr:hover { background: var(--bg); }
+    .benchmark-table tr.benchmark-row-with { background: rgba(33, 150, 243, 0.06); }
+    .benchmark-table tr.benchmark-row-without { background: rgba(255, 193, 7, 0.06); }
+    .benchmark-table tr.benchmark-row-with:hover { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-without:hover { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-table tr.benchmark-row-avg { font-weight: 600; border-top: 2px solid var(--border); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-with { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-without { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-delta-positive { color: var(--green); font-weight: 600; }
+    .benchmark-delta-negative { color: var(--red); font-weight: 600; }
+    .benchmark-notes {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .benchmark-notes h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+    }
+    .benchmark-notes ul {
+      list-style: disc;
+      padding-left: 1.25rem;
+    }
+    .benchmark-notes li {
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      margin-bottom: 0.375rem;
+    }
+    .benchmark-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    /* ---- Navigation ---- */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .nav-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .done-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .done-btn:hover {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .done-btn.ready {
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+    .done-btn.ready:hover {
+      background: var(--accent-hover);
+    }
+    /* ---- Done overlay ---- */
+    .done-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    .done-overlay.visible {
+      display: flex;
+    }
+    .done-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 2rem 3rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+    }
+    .done-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .done-card p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .done-card .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .done-card button {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .done-card button:hover {
+      background: var(--bg);
+    }
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      bottom: 5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .toast.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" style="height:100vh; display:flex; flex-direction:column;">
+    <div class="header">
+      <div>
+        <h1>Eval Review: <span id="skill-name"></span></h1>
+        <div class="instructions">Review each output and leave feedback below. Navigate with arrow keys or buttons. When done, copy feedback and paste into Claude Code.</div>
+      </div>
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <!-- View tabs (only shown when benchmark data exists) -->
+    <div class="view-tabs" id="view-tabs" style="display:none;">
+      <button class="view-tab active" onclick="switchView('outputs')">Outputs</button>
+      <button class="view-tab" onclick="switchView('benchmark')">Benchmark</button>
+    </div>
+
+    <!-- Outputs panel (qualitative review) -->
+    <div class="view-panel active" id="panel-outputs">
+    <div class="main">
+      <!-- Prompt -->
+      <div class="section">
+        <div class="section-header">Prompt <span class="config-badge" id="config-badge" style="display:none;"></span></div>
+        <div class="section-body">
+          <div class="prompt-text" id="prompt-text"></div>
+        </div>
+      </div>
+
+      <!-- Outputs -->
+      <div class="section">
+        <div class="section-header">Output</div>
+        <div class="section-body" id="outputs-body">
+          <div class="empty-state">No output files found</div>
+        </div>
+      </div>
+
+      <!-- Previous Output (collapsible) -->
+      <div class="section" id="prev-outputs-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="togglePrevOutputs()">
+            <span class="arrow" id="prev-outputs-arrow">&#9654;</span>
+            Previous Output
+          </div>
+        </div>
+        <div class="grades-content" id="prev-outputs-content"></div>
+      </div>
+
+      <!-- Grades (collapsible) -->
+      <div class="section" id="grades-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="toggleGrades()">
+            <span class="arrow" id="grades-arrow">&#9654;</span>
+            Formal Grades
+          </div>
+        </div>
+        <div class="grades-content" id="grades-content"></div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="section">
+        <div class="section-header">Your Feedback</div>
+        <div class="section-body">
+          <textarea
+            class="feedback-textarea"
+            id="feedback"
+            placeholder="What do you think of this output? Any issues, suggestions, or things that look great?"
+          ></textarea>
+          <div class="feedback-status" id="feedback-status"></div>
+          <div class="prev-feedback" id="prev-feedback" style="display:none;">
+            <div class="prev-feedback-label">Previous feedback</div>
+            <div id="prev-feedback-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav" id="outputs-nav">
+      <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">&#8592; Previous</button>
+      <button class="done-btn" id="done-btn" onclick="showDoneDialog()">Submit All Reviews</button>
+      <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next &#8594;</button>
+    </div>
+    </div><!-- end panel-outputs -->
+
+    <!-- Benchmark panel (quantitative stats) -->
+    <div class="view-panel" id="panel-benchmark">
+      <div class="benchmark-view" id="benchmark-content">
+        <div class="benchmark-empty">No benchmark data available. Run a benchmark to see quantitative results here.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Done overlay -->
+  <div class="done-overlay" id="done-overlay">
+    <div class="done-card">
+      <h2>Review Complete</h2>
+      <p>Your feedback has been saved. Go back to your Claude Code session and tell Claude you're done reviewing.</p>
+      <div class="btn-row">
+        <button onclick="closeDoneDialog()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- Embedded data (injected by generate_review.py) ----
+    const EMBEDDED_DATA = {"skill_name": "deep-research-prompt-creator", "runs": [{"id": "eval-1-chatgpt-market-research-with_skill", "prompt": "Crie um prompt para ChatGPT Deep Research investigar o mercado brasileiro de agentes de IA para atendimento ao cliente B2B em 2026, com foco em oportunidades para uma consultoria.", "eval_id": 1, "outputs": [{"name": "output.md", "type": "text", "content": "Otimizei este prompt para **ChatGPT Deep Research**, no modo combinado **exploratorio -> comparativo -> pesquisa para decisao**, com foco em oportunidades praticas para uma consultoria B2B no Brasil.\n\n```markdown\n# Papel\nVoce e um agente de Deep Research especializado em mercado brasileiro de tecnologia B2B, automacao de atendimento ao cliente, agentes de IA, CX, SaaS e consultoria empresarial.\n\nSua missao e produzir uma pesquisa auditavel, baseada em fontes, para apoiar a decisao estrategica de uma consultoria que quer identificar oportunidades no mercado brasileiro de agentes de IA para atendimento ao cliente B2B em 2026.\n\n# Contexto\n- Data de referencia da pesquisa: 2026.\n- Tema: Mercado brasileiro de agentes de IA para atendimento ao cliente B2B.\n- Pergunta principal: Quais sao as oportunidades mais promissoras para uma consultoria atuar no mercado brasileiro de agentes de IA para atendimento ao cliente B2B em 2026?\n- Publico-alvo do relatorio final: socios, diretores e lideres de uma consultoria de transformacao digital/IA que precisa decidir posicionamento, ofertas, segmentos-alvo, parcerias e mensagens comerciais.\n- Escopo geografico: Brasil, com comparacoes internacionais apenas quando ajudarem a contextualizar maturidade, benchmarks, fornecedores ou tendencias aplicaveis ao mercado brasileiro.\n- Periodo analisado: priorize dados e fontes de 2024 a 2026. Use fontes anteriores apenas para contexto estrutural ou series historicas, deixando claro quando forem mais antigas.\n- Idioma de saida: portugues do Brasil.\n- Profundidade esperada: profunda, mas orientada a decisao. Nao produza apenas panorama generico; extraia implicacoes comerciais.\n- Fontes preferidas:\n  - fontes primarias de empresas, fornecedores, integradores e plataformas;\n  - relatorios de mercado, consultorias, associa\u00c3\u00a7\u00c3\u00b5es setoriais e entidades oficiais;\n  - dados sobre CX, contact centers, atendimento digital, IA generativa, automacao, SaaS e BPO no Brasil;\n  - estudos de caso, releases, paginas de produto, documentacao tecnica, materiais para investidores e entrevistas executivas;\n  - imprensa economica e especializada, desde que usada com cautela e triangulada.\n- Fontes e abordagens a evitar:\n  - nao depender de posts promocionais isolados sem validacao externa;\n  - nao tratar claims de fornecedores como fatos sem evidencias independentes;\n  - nao extrapolar dados globais para o Brasil sem explicitar a premissa;\n  - nao assumir que \"chatbot\", \"assistente virtual\" e \"agente de IA\" sao a mesma coisa sem definir criterios.\n\n# Definicoes operacionais\nAntes de pesquisar em detalhe, estabeleca uma taxonomia clara para diferenciar:\n- chatbot tradicional;\n- bot de FAQ/URA digital;\n- copiloto de atendimento humano;\n- agente de IA autonomo ou semi-autonomo;\n- agente de voz;\n- orquestrador omnichannel;\n- plataforma de automacao conversacional;\n- solucao customizada de consultoria/integracao.\n\nExplique quais categorias entram e quais ficam fora do escopo. Quando uma fonte usar termos vagos como \"IA conversacional\", \"agentic AI\", \"virtual agent\" ou \"automacao inteligente\", classifique a oferta segundo essa taxonomia.\n\n# Politica de evidencia\n- Nao faca afirmacoes factuais importantes sem fonte.\n- Use a regra \"sem fonte, sem claim\": toda afirmacao relevante sobre tamanho de mercado, crescimento, fornecedor, adocao, caso de uso, preco, tecnologia, regulacao ou tendencia deve ter fonte ou ser marcada como \"nao verificado\".\n- Priorize fontes primarias, oficiais, tecnicas ou metodologicamente transparentes quando existirem.\n- Quando usar relatorios fechados, resumos comerciais ou dados secundarios, indique a limitacao.\n- Quando fontes divergirem, exponha a divergencia; nao crie falso consenso.\n- Compare data, metodologia, autoridade e possivel vies comercial das fontes.\n- Mantenha um ledger interno de evidencia com:\n  - claim;\n  - fonte;\n  - data;\n  - tipo de fonte;\n  - confiabilidade estimada;\n  - nota de suporte;\n  - lacuna ou ressalva.\n- No relatorio final, inclua uma versao resumida desse ledger para os achados principais.\n\n# Processo de pesquisa\nNao finalize antes de verificar lacunas, contradicoes e claims sem suporte.\n\n## 1. Reformulacao e ambiguidades\nComece reformulando a pergunta principal em suas proprias palavras.\n\nIdentifique ambiguidades que afetam a pesquisa, como:\n- o que conta como \"agente de IA\";\n- diferenca entre atendimento ao cliente, suporte tecnico, customer success, vendas e cobranca;\n- se o foco B2B significa fornecedores que vendem para empresas ou atendimento de empresas B2B aos seus clientes;\n- porte das empresas-alvo;\n- setores prioritarios.\n\nSe precisar assumir algo, assuma explicitamente e siga. Nao pare a pesquisa por falta de clarificacao.\n\n## 2. Pergunta step-back\nAntes da busca granular, responda de forma breve:\n\"Quais principios economicos, tecnologicos, operacionais e regulatorios determinam a atratividade de agentes de IA para atendimento ao cliente B2B no Brasil em 2026?\"\n\nUse essa resposta para orientar as buscas seguintes.\n\n## 3. Decomposicao em sub-perguntas\nDecomponha a pesquisa em pelo menos estas sub-perguntas:\n\n1. Qual e o tamanho, ritmo de crescimento e maturidade do mercado brasileiro relacionado a agentes de IA, IA conversacional, contact center automation, atendimento digital e CX B2B?\n2. Quais dores de atendimento ao cliente tornam agentes de IA economicamente atraentes para empresas B2B no Brasil?\n3. Quais setores brasileiros parecem mais promissores para adocao em 2026, como financeiro, seguros, saude, educacao, telecom, varejo B2B, industria, logistica, energia, SaaS e servicos profissionais?\n4. Quem sao os principais fornecedores, plataformas, integradores, consultorias e startups atuando no Brasil?\n5. Como as ofertas se diferenciam: produto SaaS, plataforma low-code, integracao com CRM/contact center, agente de voz, agente de texto, copiloto, automacao end-to-end, RAG, observabilidade, compliance?\n6. Quais casos de uso geram maior ROI ou menor friccao de compra: triagem, FAQ, suporte tecnico, abertura de tickets, status de pedidos, onboarding, cobranca, retencao, suporte interno, base de conhecimento, assistencia a agentes humanos?\n7. Quais barreiras de adocao existem no Brasil: LGPD, seguranca, qualidade de dados, integracoes legadas, confianca, governanca, sindicatos/operacao de contact center, custo, procurement, idioma, acuracia, risco reputacional?\n8. Como grandes plataformas globais e fornecedores locais estao posicionados no Brasil?\n9. Onde ha lacunas de mercado que uma consultoria pode explorar sem competir frontalmente com plataformas de software?\n10. Quais ofertas consultivas, pacotes, parcerias e mensagens comerciais seriam mais promissoras em 2026?\n\n## 4. Estrategia de busca\nPara cada sub-pergunta, crie queries variadas em portugues e ingles, combinando termos como:\n- \"agentes de IA atendimento cliente Brasil B2B 2026\";\n- \"IA conversacional Brasil contact center mercado\";\n- \"customer service AI agents Brazil B2B\";\n- \"agentic AI customer support Brazil\";\n- \"automacao atendimento IA generativa Brasil empresas\";\n- \"contact center automation Brazil AI\";\n- \"CX trends Brasil IA generativa\";\n- \"chatbots IA generativa atendimento cliente Brasil\";\n- \"voice AI atendimento Brasil\";\n- \"RAG atendimento ao cliente empresas Brasil\";\n- nomes de fornecedores, plataformas e integradores identificados durante a pesquisa.\n\nUse filtros temporais e geograficos quando possivel. Se as buscas em portugues forem superficiais, pesquise em ingles e depois valide aplicabilidade ao Brasil.\n\n## 5. Ciclos iterativos\nPesquise em ciclos:\n\n1. Busca ampla para mapear conceitos, categorias, players e dados macro.\n2. Busca direcionada por setor, caso de uso e tipo de solucao.\n3. Busca competitiva por fornecedores, consultorias, integradores e plataformas.\n4. Busca de evidencias economicas: ROI, custos, produtividade, reducao de TMA, deflexao, NPS/CSAT, resolucao no primeiro contato, volume de tickets, impacto em receita ou churn.\n5. Busca de riscos: regulacao, LGPD, governanca de IA, seguranca, alucinacao, qualidade operacional, dependencia de fornecedor.\n\nDepois de cada ciclo, registre:\n- o que foi confirmado;\n- o que permanece incerto;\n- quais fontes sao fracas, promocionais ou repetidas;\n- quais queries precisam ser reformuladas;\n- quais atores ou termos novos surgiram.\n\nSe tres buscas retornarem informacao repetida ou fraca, mude de estrategia:\n- procure fontes primarias;\n- use nomes de empresas especificas;\n- busque documentos de investidores, webinars, vagas, parcerias e estudos de caso;\n- pesquise em ingles;\n- busque por setores especificos;\n- investigue tecnologias adjacentes como CRM, help desk, contact center, BPO, CPaaS, WhatsApp Business, speech analytics e knowledge management.\n\n# Analises obrigatorias\n\n## 1. Mapa de mercado\nConstrua um mapa com categorias de atores:\n- big techs e plataformas de IA;\n- plataformas de CRM/contact center/help desk;\n- plataformas de IA conversacional;\n- startups brasileiras;\n- BPOs/contact centers;\n- consultorias e integradores;\n- fornecedores de voz, WhatsApp, CPaaS e omnichannel;\n- empresas que oferecem solucao verticalizada por setor.\n\nPara cada categoria, indique:\n- papel na cadeia de valor;\n- exemplos de empresas;\n- tipo de comprador;\n- principais mensagens comerciais;\n- onde uma consultoria pode complementar ou competir.\n\n## 2. Segmentos e setores promissores\nAvalie setores com uma matriz usando criterios como:\n- intensidade de atendimento;\n- volume e repetibilidade de interacoes;\n- pressao por reducao de custo;\n- valor de melhorar experiencia do cliente;\n- complexidade regulatoria;\n- maturidade digital;\n- facilidade de integracao;\n- disponibilidade de dados e base de conhecimento;\n- urgencia competitiva;\n- capacidade de pagar consultoria.\n\nClassifique cada setor como alta, media ou baixa atratividade para uma consultoria em 2026, explicando o racional e citando fontes.\n\n## 3. Casos de uso\nCompare casos de uso com criterios:\n- potencial de ROI;\n- tempo ate valor;\n- risco operacional;\n- complexidade tecnica;\n- necessidade de dados internos;\n- dependencia de integracoes;\n- facilidade de vender para liderancas de negocio;\n- nivel de diferenciacao para uma consultoria.\n\nInclua pelo menos:\n- agente de suporte nivel 1;\n- copiloto para atendentes humanos;\n- agente de voz;\n- agente para WhatsApp;\n- agente para triagem e roteamento;\n- agente RAG conectado a base de conhecimento;\n- automacao de tickets e follow-up;\n- agente para suporte tecnico B2B;\n- agente para customer success/onboarding;\n- agente interno para equipes de atendimento.\n\n## 4. Oportunidades para consultoria\nIdentifique oportunidades que sejam especificas para uma consultoria, nao apenas para um fornecedor de software. Considere:\n- diagnostico de maturidade e business case;\n- desenho de estrategia de IA para atendimento;\n- selecao de plataformas e RFP;\n- implementacao de pilotos em 6-12 semanas;\n- arquitetura de dados e conhecimento para RAG;\n- integracao com CRM, ERP, help desk, contact center e WhatsApp;\n- governanca, LGPD, seguranca e politicas de IA;\n- avaliacao de qualidade, testes, red teaming e observabilidade;\n- desenho de operacao humano + IA;\n- treinamento de times de atendimento;\n- change management;\n- playbooks setoriais;\n- aceleradores reutilizaveis;\n- parcerias com plataformas.\n\nPara cada oportunidade, estime:\n- cliente ideal;\n- dor resolvida;\n- oferta possivel;\n- prova de valor;\n- fontes/evidencias;\n- riscos;\n- concorrentes provaveis;\n- como diferenciar a consultoria.\n\n## 5. Competicao e posicionamento\nAnalise como uma consultoria poderia se posicionar contra:\n- plataformas SaaS que vendem direto;\n- consultorias grandes;\n- agencias de automacao;\n- BPOs/contact centers;\n- equipes internas de TI/dados;\n- startups especializadas.\n\nIndique mensagens comerciais recomendadas e mensagens a evitar.\n\n## 6. Cenarios 2026\nCrie tres cenarios para 2026:\n- conservador;\n- base;\n- acelerado.\n\nPara cada cenario, explique sinais de mercado que o sustentariam, implicacoes para uma consultoria e gatilhos que fariam mudar a recomendacao.\n\n# Verificacao final antes de escrever\nAntes de redigir o relatorio final:\n\n1. Quebre as conclusoes principais em claims atomicas.\n2. Verifique se cada claim tem suporte documental.\n3. Remova, enfraqueca ou rotule claims sem evidencia.\n4. Liste contradicoes relevantes entre fontes.\n5. Separe o que e fato, inferencia e recomendacao.\n6. Confirme que dados globais nao foram apresentados como dados brasileiros sem ressalva.\n7. Confirme que claims promocionais de fornecedores foram tratados como claims, nao como prova.\n8. Identifique lacunas que exigiriam entrevistas com clientes, fornecedores ou especialistas.\n\n# Saida final\nEntregue o relatorio final em Markdown, com linguagem executiva, objetiva e orientada a decisao.\n\nUse esta estrutura:\n\n## 1. Resumo executivo\n- 5 a 8 bullets com os achados mais importantes.\n- Inclua a recomendacao central para a consultoria.\n- Diferencie fatos fortes, inferencias plausiveis e pontos incertos.\n\n## 2. Escopo, definicoes e metodo\n- Defina \"agente de IA\" para esta pesquisa.\n- Explique fontes usadas, periodo analisado e limitacoes.\n- Descreva como evidencias foram avaliadas.\n\n## 3. Panorama do mercado brasileiro\n- Tamanho/maturidade do mercado, quando houver dados confiaveis.\n- Tendencias relevantes para 2026.\n- Relacao com CX, contact center, automacao, WhatsApp, CRM e IA generativa.\n\n## 4. Mapa competitivo\nInclua tabela com:\n- categoria de ator;\n- exemplos;\n- proposta de valor;\n- comprador tipico;\n- forcas;\n- fraquezas;\n- implicacao para consultoria.\n\n## 5. Setores mais promissores\nInclua matriz de atratividade por setor com criterios e justificativas.\n\n## 6. Casos de uso prioritarios\nInclua tabela comparando casos de uso por ROI potencial, risco, complexidade, tempo ate valor e adequacao para venda consultiva.\n\n## 7. Oportunidades para uma consultoria\nListe as oportunidades mais promissoras, priorizadas.\n\nPara cada uma, entregue:\n- descricao da oferta;\n- cliente ideal;\n- dor de negocio;\n- entregaveis;\n- tese de valor;\n- evidencias;\n- riscos;\n- diferenciacao;\n- primeiro passo comercial.\n\n## 8. Estrategia recomendada\nProponha:\n- posicionamento;\n- ICPs prioritarios;\n- ofertas empacotadas;\n- parcerias potenciais;\n- abordagem de go-to-market;\n- provas de conceito recomendadas;\n- mensagens comerciais.\n\n## 9. Riscos, incertezas e lacunas\nListe:\n- riscos de mercado;\n- riscos tecnicos;\n- riscos regulatorios/LGPD;\n- riscos de execucao;\n- lacunas de dados;\n- perguntas que exigiriam entrevistas ou pesquisa primaria.\n\n## 10. Cenarios para 2026\nCompare cenario conservador, base e acelerado, com implicacoes praticas.\n\n## 11. Recomendacoes finais\nEntregue uma lista priorizada de 5 a 10 acoes para os proximos 90 dias da consultoria.\n\n## 12. Evidencias e bibliografia\nInclua:\n- links das fontes;\n- data de publicacao ou acesso quando disponivel;\n- tipo de fonte;\n- breve nota sobre relevancia;\n- indicacao de confiabilidade quando necessario.\n\n# Criterios de qualidade\nO relatorio sera considerado bom se:\n- ajudar uma consultoria a tomar decisoes comerciais concretas;\n- separar claramente fatos, inferencias e recomendacoes;\n- trouxer evidencias rastreaveis;\n- expuser contradicoes e incertezas;\n- nao depender de hype sobre IA;\n- identificar oportunidades acionaveis, nao apenas tendencias;\n- considerar especificidades do Brasil, como WhatsApp, LGPD, maturidade digital, estrutura de contact centers, pressao de custos e dinamica de vendas B2B;\n- terminar com prioridades claras para posicionamento e go-to-market.\n```\n"}], "grading": null}, {"id": "eval-1-chatgpt-market-research-without_skill", "prompt": "Crie um prompt para ChatGPT Deep Research investigar o mercado brasileiro de agentes de IA para atendimento ao cliente B2B em 2026, com foco em oportunidades para uma consultoria.", "eval_id": 1, "outputs": [{"name": "output.md", "type": "text", "content": "Aqui est\u00c3\u00a1 um prompt pronto para usar no ChatGPT Deep Research:\n\n```markdown\nVoc\u00c3\u00aa \u00c3\u00a9 um analista s\u00c3\u00aanior de mercado, estrat\u00c3\u00a9gia B2B e transforma\u00c3\u00a7\u00c3\u00a3o digital com especializa\u00c3\u00a7\u00c3\u00a3o em IA aplicada a atendimento ao cliente. Conduza uma pesquisa profunda sobre o mercado brasileiro de agentes de IA para atendimento ao cliente B2B em 2026, com foco em identificar oportunidades estrat\u00c3\u00a9gicas para uma consultoria que deseja vender projetos, diagn\u00c3\u00b3sticos, implanta\u00c3\u00a7\u00c3\u00a3o e capacita\u00c3\u00a7\u00c3\u00a3o nessa \u00c3\u00a1rea.\n\nObjetivo da pesquisa:\nMapear o tamanho, maturidade, tend\u00c3\u00aancias, players, dores de compradores e oportunidades comerciais no Brasil para agentes de IA voltados a atendimento ao cliente B2B em 2026. O relat\u00c3\u00b3rio deve ajudar uma consultoria a decidir onde competir, quais ofertas criar, quais segmentos priorizar e como se posicionar.\n\nEscopo:\n- Mercado brasileiro.\n- Ano de refer\u00c3\u00aancia: 2026, incluindo tend\u00c3\u00aancias recentes de 2024 e 2025 quando forem necess\u00c3\u00a1rias para contextualizar.\n- Foco em agentes de IA, copilotos, chatbots avan\u00c3\u00a7ados, voicebots, automa\u00c3\u00a7\u00c3\u00a3o conversacional, atendimento omnichannel, IA generativa aplicada a suporte, customer service, customer success, help desk, p\u00c3\u00b3s-venda, relacionamento B2B e opera\u00c3\u00a7\u00c3\u00b5es de contact center.\n- Compradores B2B: empresas m\u00c3\u00a9dias e grandes, especialmente setores com alto volume ou complexidade de atendimento.\n- Foco consultivo: oportunidades para empresas que vendem estrat\u00c3\u00a9gia, implanta\u00c3\u00a7\u00c3\u00a3o, integra\u00c3\u00a7\u00c3\u00a3o, governan\u00c3\u00a7a, treinamento, change management, arquitetura de solu\u00c3\u00a7\u00c3\u00b5es, automa\u00c3\u00a7\u00c3\u00a3o de processos e melhoria de experi\u00c3\u00aancia do cliente.\n\nPerguntas centrais:\n1. Qual \u00c3\u00a9 o estado atual do mercado brasileiro de agentes de IA para atendimento ao cliente B2B?\n2. Quais tend\u00c3\u00aancias devem moldar esse mercado em 2026?\n3. Quais setores t\u00c3\u00aam maior potencial de ado\u00c3\u00a7\u00c3\u00a3o no Brasil?\n4. Quais dores e obje\u00c3\u00a7\u00c3\u00b5es os decisores B2B enfrentam ao adotar agentes de IA no atendimento?\n5. Quais players e categorias de fornecedores j\u00c3\u00a1 atuam no mercado?\n6. Onde existem lacunas que uma consultoria pode explorar?\n7. Quais ofertas consultivas seriam mais atraentes para esse mercado?\n8. Quais argumentos comerciais, provas de valor e casos de uso devem ser priorizados?\n9. Quais riscos regulat\u00c3\u00b3rios, t\u00c3\u00a9cnicos, operacionais e reputacionais precisam ser considerados?\n10. Como uma consultoria pode se diferenciar em um mercado com plataformas SaaS, integradores, hyperscalers, contact centers e startups?\n\nInvestigue no m\u00c3\u00adnimo:\n\n1. Panorama de mercado\n- Estimativas de crescimento global e regional de IA conversacional, IA generativa em atendimento, automa\u00c3\u00a7\u00c3\u00a3o de customer service e contact centers.\n- Evid\u00c3\u00aancias espec\u00c3\u00adficas sobre Brasil e Am\u00c3\u00a9rica Latina.\n- N\u00c3\u00advel de maturidade das empresas brasileiras em automa\u00c3\u00a7\u00c3\u00a3o de atendimento com IA.\n- Diferen\u00c3\u00a7as entre ado\u00c3\u00a7\u00c3\u00a3o em grandes empresas, m\u00c3\u00a9dias empresas e setores regulados.\n\n2. Segmentos priorit\u00c3\u00a1rios no Brasil\nAnalise o potencial de ado\u00c3\u00a7\u00c3\u00a3o em setores como:\n- Servi\u00c3\u00a7os financeiros, bancos, fintechs, seguradoras e meios de pagamento.\n- Sa\u00c3\u00bade, cl\u00c3\u00adnicas, hospitais, healthtechs e operadoras.\n- Telecomunica\u00c3\u00a7\u00c3\u00b5es e utilities.\n- Educa\u00c3\u00a7\u00c3\u00a3o B2B, edtechs e institui\u00c3\u00a7\u00c3\u00b5es privadas.\n- Varejo B2B, distribui\u00c3\u00a7\u00c3\u00a3o, ind\u00c3\u00bastria e log\u00c3\u00adstica.\n- Software, SaaS, tecnologia e servi\u00c3\u00a7os profissionais.\n- Contact centers, BPOs e opera\u00c3\u00a7\u00c3\u00b5es terceirizadas de atendimento.\n\nPara cada setor, indique:\n- Principais casos de uso.\n- Grau prov\u00c3\u00a1vel de urg\u00c3\u00aancia.\n- Barreiras de ado\u00c3\u00a7\u00c3\u00a3o.\n- Potencial de or\u00c3\u00a7amento.\n- Tipo de decisor envolvido.\n- Oportunidades para consultoria.\n\n3. Casos de uso com maior potencial\nMapeie e priorize casos como:\n- Atendimento de primeiro n\u00c3\u00advel.\n- Triagem e roteamento inteligente.\n- Resolu\u00c3\u00a7\u00c3\u00a3o automatizada de tickets.\n- Agentes internos para suporte a atendentes humanos.\n- Copilotos de customer service.\n- Busca em base de conhecimento com RAG.\n- Atendimento por WhatsApp, chat, e-mail e voz.\n- Recupera\u00c3\u00a7\u00c3\u00a3o de clientes e reten\u00c3\u00a7\u00c3\u00a3o.\n- Onboarding de clientes B2B.\n- Suporte t\u00c3\u00a9cnico especializado.\n- Classifica\u00c3\u00a7\u00c3\u00a3o, resumo e an\u00c3\u00a1lise de tickets.\n- Monitoramento de qualidade e compliance no atendimento.\n- Automa\u00c3\u00a7\u00c3\u00a3o de workflows p\u00c3\u00b3s-atendimento.\n\nPara cada caso de uso, avalie:\n- Impacto esperado.\n- Complexidade de implanta\u00c3\u00a7\u00c3\u00a3o.\n- Depend\u00c3\u00aancias de dados e sistemas.\n- Riscos.\n- M\u00c3\u00a9tricas de sucesso.\n- Potencial de venda consultiva.\n\n4. Compradores, decisores e dores\nIdentifique os principais decisores e influenciadores:\n- Diretores de atendimento.\n- CX.\n- Customer success.\n- Opera\u00c3\u00a7\u00c3\u00b5es.\n- TI.\n- Dados e IA.\n- Jur\u00c3\u00addico, compliance e seguran\u00c3\u00a7a.\n- CFO e diretoria executiva.\n\nMapeie suas dores por persona:\n- Redu\u00c3\u00a7\u00c3\u00a3o de custos.\n- Aumento de produtividade.\n- Melhoria de SLA.\n- Escalabilidade.\n- Qualidade e consist\u00c3\u00aancia.\n- Integra\u00c3\u00a7\u00c3\u00a3o com sistemas legados.\n- Governan\u00c3\u00a7a, seguran\u00c3\u00a7a e LGPD.\n- Medo de erros, alucina\u00c3\u00a7\u00c3\u00b5es e danos reputacionais.\n- Resist\u00c3\u00aancia interna de equipes.\n- Dificuldade de medir ROI.\n\n5. Concorr\u00c3\u00aancia e ecossistema\nMapeie categorias de players no Brasil:\n- Plataformas globais de CRM e customer service.\n- Plataformas de automa\u00c3\u00a7\u00c3\u00a3o conversacional.\n- Startups brasileiras e latino-americanas.\n- Big techs e hyperscalers.\n- Integradores e consultorias.\n- Empresas de BPO/contact center.\n- Solu\u00c3\u00a7\u00c3\u00b5es baseadas em WhatsApp Business.\n- Ferramentas de help desk e ITSM com IA.\n\nInclua exemplos relevantes, descrevendo:\n- Posicionamento.\n- P\u00c3\u00bablico-alvo.\n- Principais diferenciais.\n- Limita\u00c3\u00a7\u00c3\u00b5es percebidas.\n- Rela\u00c3\u00a7\u00c3\u00a3o direta ou indireta com oportunidades para consultoria.\n\n6. Regula\u00c3\u00a7\u00c3\u00a3o, compliance e riscos\nAnalise implica\u00c3\u00a7\u00c3\u00b5es de:\n- LGPD.\n- Marco regulat\u00c3\u00b3rio de IA no Brasil, se aplic\u00c3\u00a1vel ao cen\u00c3\u00a1rio de 2026.\n- Normas setoriais, especialmente em finan\u00c3\u00a7as, sa\u00c3\u00bade e telecom.\n- Seguran\u00c3\u00a7a da informa\u00c3\u00a7\u00c3\u00a3o.\n- Armazenamento e tratamento de dados sens\u00c3\u00adveis.\n- Auditoria, explicabilidade e rastreabilidade.\n- Riscos de vi\u00c3\u00a9s, erro, alucina\u00c3\u00a7\u00c3\u00a3o e atendimento inadequado.\n\nExplique como esses riscos podem virar oportunidade consultiva.\n\n7. Oportunidades para uma consultoria\nProponha oportunidades comerciais concretas, como:\n- Diagn\u00c3\u00b3stico de maturidade em atendimento com IA.\n- Roadmap de automa\u00c3\u00a7\u00c3\u00a3o com IA.\n- Pilotos de 4 a 8 semanas.\n- Implanta\u00c3\u00a7\u00c3\u00a3o de agentes de IA com RAG.\n- Integra\u00c3\u00a7\u00c3\u00a3o com CRM, ERP, help desk e canais como WhatsApp.\n- Governan\u00c3\u00a7a de IA no atendimento.\n- Redesenho de processos de atendimento.\n- Treinamento de equipes.\n- Cria\u00c3\u00a7\u00c3\u00a3o e curadoria de bases de conhecimento.\n- Avalia\u00c3\u00a7\u00c3\u00a3o de fornecedores.\n- M\u00c3\u00a9tricas e dashboards de ROI.\n- Programas de ado\u00c3\u00a7\u00c3\u00a3o e change management.\n\nPara cada oportunidade, detalhe:\n- Problema que resolve.\n- Cliente ideal.\n- Entreg\u00c3\u00a1veis.\n- Dura\u00c3\u00a7\u00c3\u00a3o prov\u00c3\u00a1vel.\n- Ticket potencial relativo: baixo, m\u00c3\u00a9dio ou alto.\n- Grau de diferencia\u00c3\u00a7\u00c3\u00a3o.\n- Como vender.\n\n8. Posicionamento e estrat\u00c3\u00a9gia go-to-market\nRecomende:\n- Segmentos de entrada mais promissores.\n- Oferta inicial mais f\u00c3\u00a1cil de vender.\n- Oferta premium.\n- Narrativa comercial.\n- Mensagens para decisores de neg\u00c3\u00b3cio e TI.\n- Principais obje\u00c3\u00a7\u00c3\u00b5es e respostas.\n- Canais de aquisi\u00c3\u00a7\u00c3\u00a3o.\n- Parcerias estrat\u00c3\u00a9gicas poss\u00c3\u00adveis.\n- Conte\u00c3\u00bados que a consultoria deveria produzir para gerar demanda.\n\n9. Prioriza\u00c3\u00a7\u00c3\u00a3o\nCrie uma matriz de prioriza\u00c3\u00a7\u00c3\u00a3o das oportunidades considerando:\n- Atratividade de mercado.\n- Urg\u00c3\u00aancia da dor.\n- Facilidade de venda.\n- Complexidade de entrega.\n- Margem potencial.\n- Diferencia\u00c3\u00a7\u00c3\u00a3o.\n- Risco.\n\nClassifique as oportunidades em:\n- Apostar agora.\n- Testar com pilotos.\n- Monitorar.\n- Evitar por enquanto.\n\n10. Recomenda\u00c3\u00a7\u00c3\u00b5es finais\nFinalize com:\n- 5 principais conclus\u00c3\u00b5es executivas.\n- 5 melhores oportunidades para uma consultoria em 2026.\n- 5 riscos que exigem aten\u00c3\u00a7\u00c3\u00a3o.\n- 5 a\u00c3\u00a7\u00c3\u00b5es recomendadas para os pr\u00c3\u00b3ximos 90 dias.\n- Hip\u00c3\u00b3teses que ainda precisariam ser validadas com entrevistas ou pesquisa prim\u00c3\u00a1ria.\n\nRequisitos de fontes:\n- Use fontes recentes e confi\u00c3\u00a1veis.\n- Priorize relat\u00c3\u00b3rios de consultorias, empresas de tecnologia, \u00c3\u00b3rg\u00c3\u00a3os reguladores, associa\u00c3\u00a7\u00c3\u00b5es setoriais, pesquisas de mercado, estudos acad\u00c3\u00aamicos, documentos oficiais, not\u00c3\u00adcias de neg\u00c3\u00b3cios e dados de empresas relevantes.\n- Cite as fontes ao longo do texto com links.\n- Diferencie claramente fatos comprovados, estimativas de mercado e infer\u00c3\u00aancias estrat\u00c3\u00a9gicas.\n- Quando houver aus\u00c3\u00aancia de dados espec\u00c3\u00adficos sobre Brasil, use dados globais ou latino-americanos com cautela e explicite a limita\u00c3\u00a7\u00c3\u00a3o.\n\nFormato de sa\u00c3\u00adda:\nProduza um relat\u00c3\u00b3rio estruturado em portugu\u00c3\u00aas do Brasil, com linguagem executiva e objetiva. Use tabelas quando ajudarem a comparar setores, players, casos de uso e oportunidades. Inclua uma s\u00c3\u00adntese executiva no in\u00c3\u00adcio e recomenda\u00c3\u00a7\u00c3\u00b5es pr\u00c3\u00a1ticas no final.\n\nN\u00c3\u00a3o entregue apenas uma vis\u00c3\u00a3o gen\u00c3\u00a9rica sobre IA. O foco deve ser tomada de decis\u00c3\u00a3o estrat\u00c3\u00a9gica para uma consultoria que quer vender servi\u00c3\u00a7os no mercado brasileiro de agentes de IA para atendimento ao cliente B2B em 2026.\n```\n"}], "grading": null}, {"id": "eval-2-fact-checking-roi-with_skill", "prompt": "Preciso de um prompt de fact-checking extremo para verificar as claims de um artigo sobre ROI de automacao com IA. Quero uma tabela final com status por claim.", "eval_id": 2, "outputs": [{"name": "output.md", "type": "text", "content": "Otimizei este prompt para **fact-checking extremo** em ferramentas de Deep Research com busca/RAG, como ChatGPT Deep Research, Gemini Deep Research, Claude com web/RAG ou um agente proprio. Ele for\u00c3\u00a7a decomposicao em claims atomicas, ledger de evidencia, verificacao iterativa e uma tabela final com status por claim.\n\n```markdown\n# Papel\nVoce e um agente de Deep Research especializado em fact-checking de negocios, economia de tecnologia, automacao com IA, produtividade operacional, financas corporativas e avaliacao de ROI.\n\nSua missao e verificar, com rigor extremo e fontes auditaveis, todas as claims factuais, numericas, causais e comparativas de um artigo sobre ROI de automacao com IA. O objetivo e produzir um relatorio que permita decidir se o artigo pode ser publicado, corrigido, contestado ou usado como base comercial.\n\n# Contexto\n- Data de referencia da pesquisa: use a data atual da ferramenta no momento da execucao.\n- Tema: ROI de automacao com IA.\n- Material a verificar: o artigo fornecido pelo usuario.\n- Pergunta principal: quais claims do artigo sao suportadas, contraditas, inconclusivas ou nao verificaveis segundo as melhores evidencias disponiveis?\n- Publico-alvo: liderancas de negocio, marketing, vendas, produto, consultoria, operacoes e decisores que precisam evitar claims exageradas ou juridicamente arriscadas.\n- Escopo geografico: global por padrao; destaque quando uma claim so for valida para um pais, setor, amostra, regiao ou tipo de empresa.\n- Periodo analisado: priorize fontes de 2020 em diante, mas use fontes anteriores quando forem metodologicamente importantes ou historicamente necessarias.\n- Idioma de saida: portugues.\n- Profundidade esperada: exaustiva.\n- Fontes preferidas: estudos academicos revisados por pares, relatorios tecnicos com metodologia clara, dados oficiais, documentacao de fornecedores quando a claim for sobre produto especifico, benchmarks de consultorias reconhecidas, estudos de caso com metodologia transparente, relatorios financeiros, pesquisas setoriais com amostra e metodo declarados.\n- Fontes a tratar com cautela: posts de blog sem metodologia, press releases, paginas comerciais, conteudos de afiliados, whitepapers sem amostra/metodo, pesquisas patrocinadas sem transparencia, claims de vendors sem dados primarios.\n\n# Definicoes operacionais\nUse estas definicoes antes de avaliar as claims:\n\n- \"Claim\": qualquer afirmacao verificavel do artigo, incluindo dados numericos, percentuais, comparacoes, causalidade, previsoes, generalizacoes, promessas de resultado, definicoes tecnicas, citacoes de estudos, estimativas de custo, payback, produtividade, reducao de headcount, aumento de receita, economia de tempo, ganho de margem, acuracia, qualidade, escalabilidade ou satisfacao do cliente.\n- \"Claim atomica\": a menor unidade verificavel de uma afirmacao. Se uma frase contiver tres afirmacoes, separe em tres claims.\n- \"ROI de automacao com IA\": relacao entre beneficios economicos atribuiveis a automacao com IA e custos totais de implementacao, operacao, manutencao, mudanca organizacional, governanca, riscos, integracao, treinamento e monitoramento.\n- \"Suporte forte\": evidencia direta, recente, metodologicamente clara e aplicavel ao escopo da claim.\n- \"Suporte parcial\": evidencia relacionada, mas com diferencas relevantes de setor, periodo, amostra, geografia, definicao ou metodo.\n\n# Politica de evidencia\nSiga rigorosamente estas regras:\n\n1. No source, no claim: nenhuma afirmacao factual importante pode aparecer no relatorio final sem fonte ou sem rotulo explicito de incerteza.\n2. Nao aceite estatisticas citadas no artigo sem rastrear a fonte original sempre que possivel.\n3. Diferencie fonte primaria de fonte secundaria. Se uma consultoria cita um estudo externo, tente encontrar o estudo original.\n4. Avalie metodologia, amostra, data, vies potencial, patrocinio, definicao de metricas e aplicabilidade ao contexto da claim.\n5. Nao transforme evidencia anedotica em regra geral.\n6. Nao confunda automacao tradicional/RPA com automacao usando IA generativa, machine learning ou agentes, a menos que a fonte faca essa distincao.\n7. Nao confunda produtividade potencial com ROI realizado.\n8. Nao confunda economia bruta com economia liquida. Sempre procure custos omitidos.\n9. Quando fontes divergem, exponha a divergencia; nao produza falso consenso.\n10. Quando a evidencia for insuficiente, classifique como \"inconclusiva\", \"nao verificavel\" ou \"sem evidencia suficiente\", em vez de forcar uma conclusao.\n\n# Classificacao de status por claim\nClassifique cada claim usando exatamente um dos status abaixo:\n\n- `suportada`: a claim e substancialmente confirmada por evidencia confiavel, direta e aplicavel.\n- `parcialmente suportada`: ha evidencia favoravel, mas a claim precisa de qualificacao, escopo menor, linguagem menos absoluta ou ajuste numerico.\n- `contradita`: evidencia confiavel indica que a claim e falsa, desatualizada, invertida ou materialmente enganosa.\n- `inconclusiva`: ha evidencias mistas, limitadas ou insuficientes para confirmar ou negar.\n- `nao verificavel`: a claim depende de dados privados, fontes inacessiveis, metodologia ausente ou formulacao vaga demais para checagem.\n- `opinativa/nao factual`: a frase e avaliativa, retorica ou interpretativa e nao pode ser checada como fato, embora possa ser comentada se induzir conclusao factual.\n\n# Processo de pesquisa\n\n## 1. Preparacao e leitura critica\n1. Leia o artigo inteiro antes de pesquisar.\n2. Identifique o objetivo persuasivo do artigo: vender, informar, educar, justificar investimento, gerar leads, convencer lideranca ou outro.\n3. Liste termos que precisam ser definidos: ROI, payback, produtividade, automacao, IA, IA generativa, agentes, RPA, reducao de custo, economia de tempo, ganho de receita, eficiencia operacional.\n4. Formule uma pergunta step-back antes da busca:\n   - \"Quais principios economicos, metodologicos e operacionais devem ser usados para avaliar claims sobre ROI de automacao com IA?\"\n5. A partir dessa pergunta, crie um enquadramento breve para separar:\n   - beneficios brutos vs beneficios liquidos;\n   - estimativas prospectivas vs resultados medidos;\n   - estudos de caso vs benchmarks generalizaveis;\n   - correlacao vs causalidade;\n   - produtividade individual vs impacto financeiro organizacional;\n   - automacao com IA vs automacao nao-IA.\n\n## 2. Extracao de claims atomicas\nCrie uma lista numerada de todas as claims atomicas do artigo. Inclua:\n\n- Claims numericas: percentuais, valores, ranges, multiplicadores, prazos, payback, reducao de custos, aumento de receita, horas economizadas.\n- Claims causais: \"IA reduz custos\", \"automacao aumenta receita\", \"agentes melhoram conversao\", etc.\n- Claims comparativas: \"melhor que RPA\", \"mais barato que contratar\", \"maior ROI que software tradicional\".\n- Claims de universalidade: \"toda empresa\", \"sempre\", \"em qualquer setor\", \"rapidamente\", \"sem aumentar equipe\".\n- Claims sobre fontes: \"segundo McKinsey...\", \"estudos mostram...\", \"empresas relatam...\".\n- Claims de risco omitido: seguranca, compliance, privacidade, qualidade, governanca, alucinacao, integracao, manutencao, mudanca organizacional.\n\nPara cada claim, registre:\n\n- ID da claim.\n- Trecho exato do artigo.\n- Claim atomica reescrita em linguagem neutra.\n- Tipo de claim: numerica, causal, comparativa, definicional, previsao, estudo citado, generalizacao, recomendacao baseada em fato.\n- Nivel de risco: alto, medio ou baixo.\n- O que precisaria ser verdadeiro para a claim ser considerada suportada.\n\n## 3. Decomposicao em sub-perguntas\nAntes da busca, decomponha a investigacao em sub-perguntas como:\n\n1. Quais benchmarks confiaveis existem sobre ROI de automacao com IA?\n2. Quais metricas sao mais usadas para calcular ROI de automacao com IA?\n3. Quais custos sao frequentemente omitidos em claims de ROI?\n4. Existem estudos que medem ROI realizado, nao apenas potencial?\n5. As estatisticas do artigo aparecem em fontes primarias?\n6. As claims variam por setor, tamanho de empresa, maturidade digital ou geografia?\n7. A evidencia diferencia IA generativa, machine learning, RPA, workflow automation e agentes?\n8. Ha estudos contraditorios ou limitacoes metodologicas relevantes?\n9. Quais claims podem expor o autor a risco reputacional, comercial ou legal?\n10. Que linguagem corrigida seria mais fiel a evidencia?\n\n## 4. Estrategia de busca iterativa\nPesquise em ciclos. Para cada ciclo, documente internamente:\n\n- queries usadas;\n- fontes encontradas;\n- claims que cada fonte ajuda a verificar;\n- qualidade da fonte;\n- lacunas restantes;\n- novas queries necessarias.\n\nUse queries variadas em portugues e ingles, incluindo combinacoes como:\n\n- \"AI automation ROI study methodology\"\n- \"generative AI productivity ROI enterprise study\"\n- \"AI automation cost savings benchmark\"\n- \"AI ROI realized benefits survey methodology\"\n- \"automation ROI hidden costs AI implementation\"\n- \"RPA vs AI automation ROI\"\n- \"generative AI business value report methodology\"\n- \"AI productivity gains randomized controlled trial\"\n- \"enterprise AI adoption ROI payback period\"\n- \"[claim numerica exata] source\"\n- \"[nome da consultoria] [estatistica exata] AI ROI\"\n- \"[setor mencionado] AI automation ROI case study\"\n\nSe tres buscas retornarem informacao repetida, fraca ou circular:\n\n1. mude os termos;\n2. procure a fonte primaria;\n3. use nomes exatos de estudos/autores;\n4. busque por PDFs;\n5. use bases academicas;\n6. pesquise em outra lingua;\n7. procure contradicoes explicitamente com termos como \"critique\", \"limitations\", \"failed\", \"overestimated\", \"not realized\", \"implementation cost\".\n\n## 5. Ledger de evidencia\nMantenha um ledger interno de evidencia com, no minimo, estes campos:\n\n- Claim ID.\n- Fonte.\n- Link.\n- Tipo de fonte: primaria, academica, oficial, consultoria, vendor, imprensa, blog, outro.\n- Data da fonte.\n- Metodologia/amostra, se disponivel.\n- Trecho ou dado relevante.\n- Como a fonte suporta ou contradiz a claim.\n- Confiabilidade: alta, media ou baixa.\n- Limites de aplicabilidade.\n- Nota de suporte: forte, parcial, fraca, contraditoria ou nenhuma.\n\nUse o ledger para construir a tabela final. Nao inclua no relatorio claims que nao tenham passado por essa triagem.\n\n## 6. Criterios de avaliacao especificos para ROI de IA\nAo avaliar cada claim, verifique se ela considera:\n\n- custo total de propriedade: licencas, APIs, infraestrutura, integracao, dados, seguranca, compliance, treinamento, operacao, manutencao, avaliacao humana, monitoramento e retrabalho;\n- horizonte temporal: piloto, curto prazo, 12 meses, 24 meses, longo prazo;\n- baseline: comparado a que processo anterior?\n- atribuicao: como o ganho foi atribuido a IA e nao a mudanca de processo, equipe, sazonalidade ou investimento paralelo?\n- diferenca entre economia de tempo e economia financeira realizada;\n- diferenca entre produtividade individual e margem/receita/EBITDA;\n- riscos de qualidade, erro, alucinacao, privacidade e compliance;\n- custos de gestao da mudanca e adocao;\n- variacao por setor, tamanho de empresa e maturidade operacional;\n- taxa de sucesso vs media enviesada por casos bem-sucedidos.\n\n# Verificacao final antes de responder\nAntes de escrever a resposta final:\n\n1. Releia a lista de claims atomicas.\n2. Confirme que cada claim tem status.\n3. Confirme que claims numericas foram rastreadas ate a fonte mais primaria possivel.\n4. Marque claramente quando uma estatistica aparece em fontes secundarias sem metodologia.\n5. Procure pelo menos uma evidencia potencialmente contraria para claims de alto risco.\n6. Remova linguagem exagerada do seu proprio relatorio.\n7. Nao use conclusoes mais fortes que a evidencia.\n8. Liste lacunas que impedem conclusao firme.\n9. Sugira reescritas para claims problem\u00c3\u00a1ticas.\n\n# Saida final em Markdown\nEntregue o relatorio final em portugues com as secoes abaixo.\n\n## 1. Resumo executivo\nInclua:\n\n- veredito geral sobre a confiabilidade do artigo;\n- numero total de claims avaliadas;\n- distribuicao por status;\n- principais claims problematicas;\n- risco geral de publicacao sem ajustes: baixo, medio ou alto.\n\n## 2. Escopo e metodo\nExplique brevemente:\n\n- material analisado;\n- periodo e geografia considerados;\n- tipos de fontes usadas;\n- criterios de classificacao;\n- limitacoes da pesquisa.\n\n## 3. Tabela final de fact-checking por claim\nCrie uma tabela em Markdown com estas colunas:\n\n| ID | Claim original | Claim atomica verificada | Tipo | Status | Evidencia principal | Fontes | Observacoes / correcao sugerida |\n|---|---|---|---|---|---|---|---|\n\nRegras da tabela:\n\n- Use IDs como C01, C02, C03.\n- Em \"Claim original\", cite apenas o trecho necessario.\n- Em \"Evidencia principal\", resuma a evidencia em 1-3 frases.\n- Em \"Fontes\", inclua links e, quando possivel, data e nome da organizacao/autores.\n- Em \"Observacoes / correcao sugerida\", diga como reescrever a claim para ficar fiel a evidencia.\n\n## 4. Claims de alto risco\nListe claims que exigem correcao antes de publicacao, especialmente:\n\n- numeros sem fonte;\n- promessas absolutas de ROI;\n- generalizacoes para todos os setores;\n- confusao entre potencial e resultado realizado;\n- claims que omitem custos relevantes;\n- citacoes atribuidas incorretamente;\n- extrapolacoes de estudo pequeno para mercado inteiro.\n\n## 5. Evidencias fortes encontradas\nListe as claims ou temas que parecem bem suportados, com fontes.\n\n## 6. Evidencias contraditorias, incertezas e lacunas\nExplique:\n\n- onde as fontes divergem;\n- onde faltam dados;\n- quais claims dependem de dados internos;\n- quais conclusoes nao podem ser tiradas com seguranca.\n\n## 7. Reescritas recomendadas\nForneca uma lista de reescritas para as claims problem\u00c3\u00a1ticas. Use linguagem precisa, com qualificadores como:\n\n- \"pode\";\n- \"em determinados contextos\";\n- \"segundo [fonte]\";\n- \"em empresas com [condicao]\";\n- \"a evidencia disponivel sugere\";\n- \"o ROI depende de custos de implementacao, adocao e governanca\".\n\n## 8. Bibliografia\nListe todas as fontes usadas com:\n\n- titulo;\n- autor/organizacao;\n- data;\n- link;\n- tipo de fonte;\n- breve nota sobre confiabilidade/metodologia.\n\n# Padrao de qualidade\nO relatorio so deve ser considerado completo se:\n\n- todas as claims verificaveis do artigo tiverem status;\n- nenhuma claim importante estiver sem fonte ou sem rotulo de incerteza;\n- a tabela final for suficiente para auditoria;\n- fontes conflitantes forem explicitadas;\n- estatisticas forem rastreadas ate a fonte mais primaria possivel;\n- o relatorio diferenciar potencial de ROI realizado;\n- custos omitidos forem considerados;\n- houver recomendacoes claras de correcao para claims problem\u00c3\u00a1ticas.\n\n# Material para verificar\nCole abaixo o artigo completo:\n\n[COLE AQUI O ARTIGO SOBRE ROI DE AUTOMACAO COM IA]\n```\n\nSe quiser deixar ainda mais severo, acrescente ao prompt: \"Para cada claim classificada como suportada, tente ativamente refuta-la antes de confirmar o status final.\"\n"}], "grading": null}, {"id": "eval-2-fact-checking-roi-without_skill", "prompt": "Preciso de um prompt de fact-checking extremo para verificar as claims de um artigo sobre ROI de automacao com IA. Quero uma tabela final com status por claim.", "eval_id": 2, "outputs": [{"name": "output.md", "type": "text", "content": "Aqui vai um prompt de fact-checking extremo, pronto para usar:\n\n```markdown\nVoc\u00c3\u00aa \u00c3\u00a9 um investigador s\u00c3\u00aanior de fact-checking, auditoria metodol\u00c3\u00b3gica e an\u00c3\u00a1lise econ\u00c3\u00b4mica aplicada a automa\u00c3\u00a7\u00c3\u00a3o com IA. Sua tarefa \u00c3\u00a9 verificar, com rigor m\u00c3\u00a1ximo, todas as claims de um artigo sobre ROI de automa\u00c3\u00a7\u00c3\u00a3o com IA.\n\n## Objetivo\n\nAvaliar se as afirma\u00c3\u00a7\u00c3\u00b5es do artigo s\u00c3\u00a3o verdadeiras, falsas, exageradas, mal fundamentadas, imposs\u00c3\u00adveis de verificar ou dependentes de contexto. O resultado final deve ser uma tabela claim-by-claim com status, evid\u00c3\u00aancias, n\u00c3\u00advel de confian\u00c3\u00a7a e corre\u00c3\u00a7\u00c3\u00b5es recomendadas.\n\n## Material de entrada\n\nVou fornecer abaixo o artigo completo:\n\n[COLE AQUI O ARTIGO]\n\n## Escopo da verifica\u00c3\u00a7\u00c3\u00a3o\n\nExtraia e verifique todas as claims factuais, quantitativas, causais, comparativas, preditivas e normativas disfar\u00c3\u00a7adas de fato. Inclua especialmente claims sobre:\n\n- ROI de automa\u00c3\u00a7\u00c3\u00a3o com IA\n- Payback\n- Redu\u00c3\u00a7\u00c3\u00a3o de custos\n- Ganhos de produtividade\n- Aumento de receita\n- Redu\u00c3\u00a7\u00c3\u00a3o de headcount\n- Redu\u00c3\u00a7\u00c3\u00a3o de erros\n- Tempo economizado\n- Ado\u00c3\u00a7\u00c3\u00a3o de IA por empresas\n- Benchmarks de mercado\n- Estudos de caso\n- Estat\u00c3\u00adsticas citadas sem fonte\n- Proje\u00c3\u00a7\u00c3\u00b5es futuras\n- Claims sobre ferramentas, agentes, RPA, copilots, chatbots ou automa\u00c3\u00a7\u00c3\u00a3o generativa\n- Afirma\u00c3\u00a7\u00c3\u00b5es como \"empresas que usam IA crescem X%\", \"IA reduz custos em Y%\", \"o ROI m\u00c3\u00a9dio \u00c3\u00a9 Z\", \"automa\u00c3\u00a7\u00c3\u00a3o paga em N meses\"\n\n## Processo obrigat\u00c3\u00b3rio\n\n1. Leia o artigo inteiro.\n2. Liste todas as claims verific\u00c3\u00a1veis, separando uma claim por linha.\n3. Classifique cada claim por tipo:\n   - Estat\u00c3\u00adstica\n   - Causalidade\n   - Compara\u00c3\u00a7\u00c3\u00a3o\n   - Benchmark\n   - Proje\u00c3\u00a7\u00c3\u00a3o\n   - Estudo de caso\n   - Defini\u00c3\u00a7\u00c3\u00a3o\n   - Interpreta\u00c3\u00a7\u00c3\u00a3o econ\u00c3\u00b4mica\n   - Recomenda\u00c3\u00a7\u00c3\u00a3o baseada em evid\u00c3\u00aancia\n4. Para cada claim, identifique exatamente o que precisaria ser verdadeiro para ela se sustentar.\n5. Procure evid\u00c3\u00aancias prim\u00c3\u00a1rias ou fontes altamente confi\u00c3\u00a1veis.\n6. D\u00c3\u00aa prefer\u00c3\u00aancia, nesta ordem, a:\n   - Estudos acad\u00c3\u00aamicos revisados por pares\n   - Relat\u00c3\u00b3rios oficiais de governos, OCDE, Banco Mundial, FMI, Eurostat, BLS ou \u00c3\u00b3rg\u00c3\u00a3os equivalentes\n   - Relat\u00c3\u00b3rios t\u00c3\u00a9cnicos de consultorias reconhecidas, quando a metodologia for clara\n   - Documenta\u00c3\u00a7\u00c3\u00a3o ou estudos publicados pelas pr\u00c3\u00b3prias empresas citadas, com ressalvas de conflito de interesse\n   - Dados financeiros auditados\n   - Pesquisas com metodologia, amostra e data expl\u00c3\u00adcitas\n7. N\u00c3\u00a3o aceite como prova:\n   - Posts de blog sem metodologia\n   - Materiais promocionais de fornecedores\n   - Estat\u00c3\u00adsticas repetidas sem fonte original\n   - Claims de vendas\n   - Cita\u00c3\u00a7\u00c3\u00b5es circulares\n   - Estudos sem amostra, per\u00c3\u00adodo ou defini\u00c3\u00a7\u00c3\u00a3o operacional\n8. Verifique se n\u00c3\u00bameros foram tirados de contexto.\n9. Verifique se percentuais usam denominador claro.\n10. Verifique se ROI foi calculado corretamente.\n11. Diferencie economia potencial, economia realizada e economia estimada.\n12. Diferencie produtividade individual, produtividade de processo e impacto financeiro no P&L.\n13. Avalie se o artigo confunde automa\u00c3\u00a7\u00c3\u00a3o tradicional, RPA, IA generativa, machine learning e agentes de IA.\n14. Verifique se h\u00c3\u00a1 cherry-picking, extrapola\u00c3\u00a7\u00c3\u00a3o indevida ou generaliza\u00c3\u00a7\u00c3\u00a3o de casos isolados.\n15. Aponte claims que exigem segmenta\u00c3\u00a7\u00c3\u00a3o por setor, porte da empresa, maturidade digital, custo de implementa\u00c3\u00a7\u00c3\u00a3o, integra\u00c3\u00a7\u00c3\u00a3o, governan\u00c3\u00a7a, seguran\u00c3\u00a7a e qualidade dos dados.\n\n## Crit\u00c3\u00a9rios para ROI\n\nAo avaliar claims de ROI, verifique se a afirma\u00c3\u00a7\u00c3\u00a3o considera:\n\n- Custo de licen\u00c3\u00a7as\n- Custo de implementa\u00c3\u00a7\u00c3\u00a3o\n- Custo de integra\u00c3\u00a7\u00c3\u00a3o\n- Custo de treinamento\n- Custo de mudan\u00c3\u00a7a organizacional\n- Custo de manuten\u00c3\u00a7\u00c3\u00a3o\n- Custo de supervis\u00c3\u00a3o humana\n- Custo de auditoria e compliance\n- Custo de erros, retrabalho ou alucina\u00c3\u00a7\u00c3\u00b5es\n- Tempo at\u00c3\u00a9 ado\u00c3\u00a7\u00c3\u00a3o real\n- Taxa de utiliza\u00c3\u00a7\u00c3\u00a3o pelos usu\u00c3\u00a1rios\n- Custo de oportunidade\n- Benef\u00c3\u00adcios recorrentes vs. benef\u00c3\u00adcios pontuais\n- Benef\u00c3\u00adcios brutos vs. benef\u00c3\u00adcios l\u00c3\u00adquidos\n- Horizonte temporal do c\u00c3\u00a1lculo\n- F\u00c3\u00b3rmula expl\u00c3\u00adcita de ROI\n\nUse a f\u00c3\u00b3rmula:\n\nROI = (Benef\u00c3\u00adcios l\u00c3\u00adquidos - Custos totais) / Custos totais\n\nSe o artigo usar outra f\u00c3\u00b3rmula, explique a diferen\u00c3\u00a7a e o impacto.\n\n## Status permitidos\n\nUse apenas estes status:\n\n- Verificada\n- Provavelmente verdadeira\n- Parcialmente verdadeira\n- Enganosa\n- N\u00c3\u00a3o comprovada\n- Provavelmente falsa\n- Falsa\n- Imposs\u00c3\u00advel verificar\n- Depende do contexto\n\n## N\u00c3\u00advel de confian\u00c3\u00a7a\n\nPara cada claim, atribua confian\u00c3\u00a7a:\n\n- Alta\n- M\u00c3\u00a9dia\n- Baixa\n\nExplique brevemente o motivo da confian\u00c3\u00a7a.\n\n## Sa\u00c3\u00adda esperada\n\nEntregue a an\u00c3\u00a1lise em portugu\u00c3\u00aas, com as seguintes se\u00c3\u00a7\u00c3\u00b5es:\n\n### 1. Resumo executivo\n\nSintetize:\n\n- Quantas claims foram analisadas\n- Quantas foram verificadas\n- Quantas s\u00c3\u00a3o enganosas, falsas ou n\u00c3\u00a3o comprovadas\n- Qual \u00c3\u00a9 o risco geral do artigo\n- Se o artigo \u00c3\u00a9 adequado para publica\u00c3\u00a7\u00c3\u00a3o sem corre\u00c3\u00a7\u00c3\u00b5es\n\n### 2. Principais problemas encontrados\n\nListe os problemas mais graves, como:\n\n- Estat\u00c3\u00adsticas sem fonte\n- ROI sem custos completos\n- Generaliza\u00c3\u00a7\u00c3\u00b5es indevidas\n- Confus\u00c3\u00a3o entre produtividade e lucro\n- Uso de dados de fornecedores como se fossem neutros\n- Proje\u00c3\u00a7\u00c3\u00b5es apresentadas como fato\n- Falta de segmenta\u00c3\u00a7\u00c3\u00a3o por setor ou porte\n\n### 3. Tabela final de fact-checking\n\nCrie uma tabela com estas colunas:\n\n| ID | Claim original | Tipo | Status | Evid\u00c3\u00aancia encontrada | Fonte(s) | Problema metodol\u00c3\u00b3gico | Corre\u00c3\u00a7\u00c3\u00a3o recomendada | Confian\u00c3\u00a7a |\n|---|---|---|---|---|---|---|---|---|\n\nRegras da tabela:\n\n- Mantenha a claim original o mais fiel poss\u00c3\u00advel ao texto.\n- Se a claim for longa, resuma sem mudar o sentido.\n- Em \"Evid\u00c3\u00aancia encontrada\", explique de forma objetiva o que as fontes indicam.\n- Em \"Fonte(s)\", inclua nome da fonte, ano e link quando dispon\u00c3\u00advel.\n- Em \"Problema metodol\u00c3\u00b3gico\", aponte falhas de c\u00c3\u00a1lculo, escopo, causalidade, amostra ou extrapola\u00c3\u00a7\u00c3\u00a3o.\n- Em \"Corre\u00c3\u00a7\u00c3\u00a3o recomendada\", escreva uma vers\u00c3\u00a3o mais precisa e public\u00c3\u00a1vel da claim.\n\n### 4. An\u00c3\u00a1lise do c\u00c3\u00a1lculo de ROI\n\nSe o artigo tiver c\u00c3\u00a1lculos, refa\u00c3\u00a7a ou audite os c\u00c3\u00a1lculos. Mostre:\n\n- F\u00c3\u00b3rmula usada no artigo\n- F\u00c3\u00b3rmula correta ou mais defens\u00c3\u00a1vel\n- Custos omitidos\n- Benef\u00c3\u00adcios inflados\n- Sensibilidade do resultado a premissas cr\u00c3\u00adticas\n- Cen\u00c3\u00a1rio conservador\n- Cen\u00c3\u00a1rio base\n- Cen\u00c3\u00a1rio otimista\n\nSe o artigo n\u00c3\u00a3o trouxer c\u00c3\u00a1lculos suficientes, diga explicitamente que o ROI n\u00c3\u00a3o pode ser validado.\n\n### 5. Claims que exigem reescrita antes da publica\u00c3\u00a7\u00c3\u00a3o\n\nListe as claims que n\u00c3\u00a3o devem ser publicadas como est\u00c3\u00a3o e forne\u00c3\u00a7a vers\u00c3\u00b5es corrigidas.\n\n### 6. Veredito final\n\nClassifique o artigo como:\n\n- Public\u00c3\u00a1vel sem altera\u00c3\u00a7\u00c3\u00b5es\n- Public\u00c3\u00a1vel com pequenas corre\u00c3\u00a7\u00c3\u00b5es\n- Public\u00c3\u00a1vel apenas com corre\u00c3\u00a7\u00c3\u00b5es substanciais\n- N\u00c3\u00a3o recomend\u00c3\u00a1vel para publica\u00c3\u00a7\u00c3\u00a3o\n\nJustifique em at\u00c3\u00a9 2 par\u00c3\u00a1grafos.\n\n## Regras de rigor\n\n- N\u00c3\u00a3o invente fontes.\n- N\u00c3\u00a3o preencha lacunas com suposi\u00c3\u00a7\u00c3\u00b5es.\n- Quando n\u00c3\u00a3o houver evid\u00c3\u00aancia suficiente, marque como \"N\u00c3\u00a3o comprovada\" ou \"Imposs\u00c3\u00advel verificar\".\n- Se uma claim for verdadeira apenas em condi\u00c3\u00a7\u00c3\u00b5es espec\u00c3\u00adficas, marque como \"Depende do contexto\".\n- Se a reda\u00c3\u00a7\u00c3\u00a3o induzir o leitor a uma conclus\u00c3\u00a3o maior do que a evid\u00c3\u00aancia permite, marque como \"Enganosa\".\n- Diferencie \"h\u00c3\u00a1 evid\u00c3\u00aancia de que pode acontecer\" de \"acontece em m\u00c3\u00a9dia\".\n- Diferencie \"caso de sucesso\" de \"benchmark generaliz\u00c3\u00a1vel\".\n- N\u00c3\u00a3o use linguagem diplom\u00c3\u00a1tica para suavizar problemas factuais.\n- Seja c\u00c3\u00a9tico com n\u00c3\u00bameros redondos, percentuais sem denominador e promessas de payback muito curto.\n- Sempre que poss\u00c3\u00advel, rastreie a fonte original de cada estat\u00c3\u00adstica.\n- Se n\u00c3\u00a3o encontrar a fonte original, diga isso.\n\n## Formato final\n\nResponda em portugu\u00c3\u00aas brasileiro. Use linguagem clara, precisa e severa. N\u00c3\u00a3o escreva uma an\u00c3\u00a1lise gen\u00c3\u00a9rica: produza uma auditoria claim-by-claim.\n```\n"}], "grading": null}, {"id": "eval-3-tools-comparison-with_skill", "prompt": "Monte um prompt generico para comparar 5 ferramentas de pesquisa profunda usando fontes oficiais, reviews independentes e criterios claros de decisao.", "eval_id": 3, "outputs": [{"name": "output.md", "type": "text", "content": "Otimizei o prompt para um agente generico de Deep Research, no modo **comparativo + pesquisa para decisao**. Ele foi desenhado para comparar 5 ferramentas usando fontes oficiais, reviews independentes e criterios claros de decisao.\n\n```markdown\n# Papel\nVoce e um agente de Deep Research especializado em avaliacao comparativa de ferramentas digitais e software. Sua missao e produzir uma pesquisa auditavel, baseada em fontes, para comparar 5 ferramentas de pesquisa profunda e apoiar uma decisao clara de escolha, shortlist ou recomendacao por perfil de uso.\n\n# Contexto\n- Data de referencia da pesquisa: [DATA_ATUAL]\n- Tema: comparacao de 5 ferramentas de pesquisa profunda.\n- Ferramentas a comparar: [FERRAMENTA_1], [FERRAMENTA_2], [FERRAMENTA_3], [FERRAMENTA_4], [FERRAMENTA_5].\n- Pergunta principal: qual dessas 5 ferramentas e a melhor opcao para [PUBLICO_ALVO/CASO_DE_USO], considerando qualidade de pesquisa, confiabilidade das fontes, facilidade de uso, cobertura, transparencia, custo e adequacao ao fluxo de trabalho?\n- Decisao que a pesquisa deve apoiar: [ESCOLHER_UMA_FERRAMENTA / MONTAR_SHORTLIST / DEFINIR_FERRAMENTA_POR_PERFIL / COMPARAR_PARA_COMPRA].\n- Publico-alvo do relatorio: [PUBLICO_ALVO].\n- Escopo geografico: [GLOBAL / BRASIL / EUA / EUROPA / OUTRO].\n- Periodo analisado: priorize informacoes dos ultimos 12 meses, mas use fontes anteriores quando forem documentacao oficial, politicas, benchmarks relevantes ou reviews ainda validos.\n- Idioma de saida: [IDIOMA].\n- Profundidade esperada: media a exaustiva, com foco em decisao pratica.\n\n# Fontes obrigatorias\nUse pelo menos estes tres tipos de fonte para cada ferramenta, quando disponiveis:\n\n1. Fontes oficiais\n   - Paginas de produto, documentacao, changelogs, help center, pricing, termos, politicas de privacidade, paginas de seguranca, comunicados oficiais e posts do fornecedor.\n\n2. Reviews independentes\n   - Reviews de veiculos especializados, analises de especialistas, comparativos independentes, comunidades tecnicas, avaliadores reconhecidos e publicacoes que testaram as ferramentas diretamente.\n\n3. Evidencias de mercado e usuarios\n   - Marketplaces de software, comentarios de usuarios, benchmarks publicos, discussoes tecnicas, estudos de caso, reclamacoes recorrentes e sinais de adocao.\n\nPriorize fontes primarias para claims sobre recursos, precos, limites, privacidade, integracoes e disponibilidade. Use reviews independentes para avaliar experiencia real, qualidade percebida, limitacoes e trade-offs.\n\n# Fontes e abordagens a evitar\n- Nao use apenas listas afiliadas, conteudo SEO superficial ou paginas que repetem claims comerciais sem teste proprio.\n- Nao trate posts patrocinados como review independente.\n- Nao compare ferramentas com base em uma unica fonte.\n- Nao invente recursos, precos, limites, integracoes ou politicas quando eles nao estiverem documentados.\n- Nao crie falso consenso quando fontes divergirem.\n\n# Politica de evidencia\n- No source, no claim: toda afirmacao factual importante deve estar ligada a uma fonte ou marcada como \"nao verificado\".\n- Mantenha um ledger interno de evidencia com: claim, ferramenta, fonte, data da fonte ou data de acesso, tipo de fonte, confiabilidade e nota de suporte.\n- Classifique a confiabilidade de cada fonte como alta, media ou baixa.\n- Quando fontes entrarem em conflito, explique a divergencia e compare data, metodologia, autoridade e possivel incentivo comercial.\n- Quando nao houver evidencia suficiente, declare \"inconclusivo\", \"nao verificado\" ou \"evidencia insuficiente\".\n- Diferencie fatos documentados, observacoes de reviewers, feedback de usuarios e inferencias suas.\n\n# Processo de pesquisa\n\n## 1. Reformulacao e ambiguidades\nAntes de pesquisar, reformule a pergunta principal em uma frase objetiva. Liste ambiguidades que podem afetar a comparacao, como:\n- o que significa \"pesquisa profunda\" neste contexto;\n- se o foco e uso individual, empresarial, academico, jornalistico, tecnico ou estrategico;\n- se custo, privacidade, citacoes, qualidade de sintese ou automacao pesam mais;\n- se a ferramenta precisa navegar na web, analisar arquivos, exportar relatorios, citar fontes ou integrar com sistemas.\n\nSe alguma ambiguidade nao puder ser resolvida, assuma um default razoavel e declare a premissa.\n\n## 2. Step-back\nAntes de comparar as ferramentas, responda brevemente:\n- Quais sao os principios que definem uma boa ferramenta de pesquisa profunda?\n- Quais riscos sao comuns nesse tipo de ferramenta?\n- Que diferenca existe entre busca simples, resposta com web, agente de pesquisa, RAG e relatorio de Deep Research?\n- Que criterios deveriam importar para uma decisao real de compra ou adocao?\n\nUse essa resposta para justificar os criterios de avaliacao.\n\n## 3. Decomposicao em sub-perguntas\nDivida a pesquisa nestas sub-perguntas:\n\n1. Quais recursos oficiais cada ferramenta oferece para pesquisa profunda?\n2. Como cada ferramenta busca, seleciona, cita e verifica fontes?\n3. Que tipos de fonte cada ferramenta consegue usar: web aberta, PDFs, documentos internos, bases academicas, conectores, arquivos locais ou integracoes?\n4. Qual e a qualidade percebida dos outputs em reviews independentes?\n5. Quais sao os limites conhecidos: alucinacoes, citacoes fracas, fontes inacessiveis, cobertura limitada, contexto curto, lentidao, custo ou bloqueios regionais?\n6. Quais sao as politicas relevantes de privacidade, seguranca, uso de dados e compliance?\n7. Como se comparam preco, planos, limites de uso e custo total?\n8. Para quais perfis de usuario cada ferramenta parece mais adequada?\n9. Quais criterios sao decisivos para [PUBLICO_ALVO/CASO_DE_USO]?\n10. Qual recomendacao final e mais defensavel com base na evidencia?\n\n## 4. Criterios de avaliacao\nCrie uma matriz comparativa com criterios claros. Use estes criterios como base e ajuste ao caso de uso:\n\n| Criterio | Peso sugerido | O que avaliar |\n|---|---:|---|\n| Qualidade e profundidade da pesquisa | 20% | Capacidade de decompor perguntas, pesquisar em ciclos, sintetizar evidencias e produzir relatorios robustos. |\n| Qualidade das fontes e citacoes | 20% | Transparencia das fontes, links verificaveis, diversidade, autoridade e tratamento de contradicoes. |\n| Precisao e confiabilidade | 15% | Incidencia de erros reportados, alucinacoes, claims sem suporte e capacidade de declarar incerteza. |\n| Cobertura e conectores | 10% | Web, arquivos, PDFs, documentos internos, bases academicas, integracoes e idiomas. |\n| Usabilidade e fluxo de trabalho | 10% | Facilidade de uso, controle do usuario, exportacao, colaboracao, velocidade e ergonomia. |\n| Privacidade, seguranca e compliance | 10% | Politicas de dados, controles empresariais, retencao, treinamento com dados do usuario e certificacoes. |\n| Custo e limites | 10% | Preco, limites de uso, planos, relacao custo-beneficio e previsibilidade. |\n| Adequacao ao caso de uso | 5% | Fit especifico para [PUBLICO_ALVO/CASO_DE_USO]. |\n\nSe os pesos nao forem adequados ao objetivo, proponha uma versao alternativa e explique a mudanca.\n\n## 5. Busca iterativa\nPesquise em ciclos. Para cada ferramenta:\n\n1. Comece por fontes oficiais:\n   - \"[NOME_DA_FERRAMENTA] official deep research documentation\"\n   - \"[NOME_DA_FERRAMENTA] pricing\"\n   - \"[NOME_DA_FERRAMENTA] privacy policy data usage\"\n   - \"[NOME_DA_FERRAMENTA] release notes changelog research\"\n\n2. Depois busque reviews independentes:\n   - \"[NOME_DA_FERRAMENTA] deep research review\"\n   - \"[NOME_DA_FERRAMENTA] vs [OUTRA_FERRAMENTA] independent review\"\n   - \"[NOME_DA_FERRAMENTA] limitations hallucinations citations review\"\n   - \"[NOME_DA_FERRAMENTA] benchmark research quality\"\n\n3. Busque evidencias de usuarios e mercado:\n   - \"[NOME_DA_FERRAMENTA] user reviews research\"\n   - \"[NOME_DA_FERRAMENTA] complaints limitations\"\n   - \"[NOME_DA_FERRAMENTA] enterprise security compliance\"\n\nDepois de cada ciclo, registre:\n- o que foi confirmado;\n- o que continua incerto;\n- quais fontes parecem fracas, repetidas ou enviesadas;\n- quais queries precisam ser reformuladas;\n- quais claims exigem fonte primaria.\n\nSe tres buscas retornarem informacao repetida, superficial ou afiliada, mude a estrategia:\n- use nomes exatos de recursos;\n- pesquise em outro idioma;\n- busque documentacao, changelogs e help centers;\n- busque termos como \"limitations\", \"known issues\", \"privacy\", \"citations\", \"benchmark\", \"methodology\";\n- procure comparativos com metodologia explicita;\n- busque fontes de usuarios com cautela e rotule sua confiabilidade.\n\n## 6. Tratamento de reviews independentes\nAo usar reviews, avalie:\n- O autor testou a ferramenta diretamente?\n- A metodologia esta clara?\n- O review compara tarefas equivalentes?\n- Ha disclosure de afiliacao, patrocinio ou parceria?\n- A data do review ainda e atual?\n- As conclusoes sao apoiadas por exemplos, screenshots, outputs ou testes?\n\nNao atribua o mesmo peso a um review superficial e a uma analise com metodologia transparente.\n\n## 7. Verificacao final antes de escrever\nAntes de produzir o relatorio final:\n\n1. Quebre as conclusoes principais em claims atomicas.\n2. Verifique se cada claim tem fonte suficiente.\n3. Remova ou rotule claims sem suporte.\n4. Identifique contradicoes entre fontes oficiais, reviews e usuarios.\n5. Revise se os precos, planos e limites podem ter mudado; marque a data de acesso.\n6. Separe claramente:\n   - fatos documentados;\n   - opinioes de reviewers;\n   - feedback de usuarios;\n   - inferencias suas.\n7. Liste lacunas de evidencia que poderiam mudar a recomendacao.\n\n# Saida final\nEntregue o relatorio em Markdown com estas secoes:\n\n## 1. Resumo executivo\n- Melhor opcao geral.\n- Melhor opcao por perfil de uso.\n- Principais trade-offs.\n- Nivel de confianca da recomendacao: alto, medio ou baixo.\n\n## 2. Escopo e metodo\n- Ferramentas comparadas.\n- Data da pesquisa.\n- Tipos de fonte usados.\n- Como os criterios e pesos foram definidos.\n- Limitacoes do metodo.\n\n## 3. Criterios de decisao\nApresente os criterios, pesos e justificativas em tabela.\n\n## 4. Tabela comparativa\nInclua uma tabela com:\n- ferramenta;\n- pontos fortes;\n- pontos fracos;\n- criterios em que se destaca;\n- criterios em que fica atras;\n- preco/planos relevantes, quando verificavel;\n- melhor perfil de uso;\n- principais fontes.\n\n## 5. Analise por ferramenta\nPara cada ferramenta, inclua:\n- resumo;\n- recursos oficiais relevantes;\n- evidencias de reviews independentes;\n- feedback de usuarios ou mercado;\n- riscos e limitacoes;\n- avaliacao por criterio;\n- nivel de confianca da avaliacao.\n\n## 6. Matriz de pontuacao\nCrie uma matriz com notas de 1 a 5 por criterio, peso, pontuacao ponderada e justificativa curta. Nao use falsa precisao: se a evidencia for fraca, indique isso na propria celula.\n\n## 7. Divergencias, incertezas e lacunas\nListe:\n- claims conflitantes;\n- areas com evidencia insuficiente;\n- dados que podem estar desatualizados;\n- perguntas que exigiriam teste pratico.\n\n## 8. Recomendacao final\nEntregue uma recomendacao condicionada:\n- escolha recomendada para [PUBLICO_ALVO/CASO_DE_USO];\n- segunda melhor opcao;\n- quando escolher cada alternativa;\n- quando nao escolher cada ferramenta;\n- sinais que mudariam a recomendacao.\n\n## 9. Proximos passos\nSugira um plano curto de validacao:\n- teste pratico com 3 tarefas padronizadas;\n- checklist de compra ou adocao;\n- perguntas para fornecedores;\n- criterios para piloto.\n\n## 10. Bibliografia\nListe todas as fontes com:\n- titulo;\n- organizacao/autor;\n- URL;\n- data de publicacao, quando disponivel;\n- data de acesso;\n- tipo de fonte: oficial, review independente, usuario/mercado, benchmark ou outra;\n- confiabilidade estimada.\n\n# Regras finais\n- Nao finalize antes de revisar lacunas e contradicoes.\n- Nao afirme que uma ferramenta e \"a melhor\" sem explicar \"melhor para quem\" e com quais criterios.\n- Se a comparacao depender de testes que voce nao consegue executar, diga isso e recomende um protocolo de teste.\n- Seja direto, mas auditavel: toda conclusao importante deve poder ser rastreada ate as fontes.\n```\n\nAjustes rapidos que voce pode fazer antes de usar:\n\n- Troque `[FERRAMENTA_1]` a `[FERRAMENTA_5]` pelos nomes reais.\n- Defina `[PUBLICO_ALVO/CASO_DE_USO]`, por exemplo: consultoria estrategica, pesquisa academica, jornalismo, vendas B2B, produto, juridico ou inteligencia de mercado.\n- Altere os pesos se a decisao priorizar custo, privacidade, qualidade das citacoes ou integracao com documentos internos.\n"}], "grading": null}, {"id": "eval-3-tools-comparison-without_skill", "prompt": "Monte um prompt generico para comparar 5 ferramentas de pesquisa profunda usando fontes oficiais, reviews independentes e criterios claros de decisao.", "eval_id": 3, "outputs": [{"name": "output.md", "type": "text", "content": "Aqui vai um prompt generico que voce pode usar em uma ferramenta de deep research:\n\n```markdown\nVoce e um analista senior de produto e tecnologia. Sua tarefa e comparar 5 ferramentas de pesquisa profunda: [FERRAMENTA 1], [FERRAMENTA 2], [FERRAMENTA 3], [FERRAMENTA 4] e [FERRAMENTA 5].\n\nObjetivo:\nProduzir uma comparacao clara, verificavel e orientada a decisao, usando fontes oficiais, reviews independentes e criterios objetivos.\n\nEscopo da pesquisa:\n1. Consulte fontes oficiais de cada ferramenta, incluindo site, documentacao, paginas de preco, changelog, central de ajuda, comunicados da empresa e politicas relevantes.\n2. Consulte reviews independentes, como publicacoes especializadas, comparativos de mercado, avaliacoes de usuarios, comunidades tecnicas, videos analiticos e benchmarks publicados.\n3. Priorize informacoes atuais. Quando houver divergencia entre fontes, explique a diferenca e indique qual fonte parece mais confiavel.\n4. Inclua links para todas as fontes usadas.\n\nFerramentas a comparar:\n- [FERRAMENTA 1]\n- [FERRAMENTA 2]\n- [FERRAMENTA 3]\n- [FERRAMENTA 4]\n- [FERRAMENTA 5]\n\nContexto de decisao:\nO comprador precisa escolher uma ferramenta para [DESCREVER CASO DE USO: pesquisa academica, inteligencia competitiva, criacao de relatorios, suporte a consultoria, analise juridica, due diligence, etc.].\n\nPublico-alvo da recomendacao:\n[DESCREVER PERFIL: equipe pequena, empresa enterprise, pesquisador individual, consultoria, time de marketing, time juridico, area de produto, etc.]\n\nCriterios de avaliacao:\nAvalie cada ferramenta de 1 a 5 nos criterios abaixo e justifique cada nota com evidencias:\n\n1. Qualidade da pesquisa\n   - Profundidade da investigacao\n   - Capacidade de sintetizar fontes complexas\n   - Precisao das respostas\n   - Tratamento de ambiguidade e contradicoes\n\n2. Qualidade das fontes\n   - Uso de fontes oficiais\n   - Diversidade de fontes independentes\n   - Transparencia nas citacoes\n   - Facilidade de verificar as afirmacoes\n\n3. Capacidades analiticas\n   - Comparacao entre alternativas\n   - Raciocinio estruturado\n   - Identificacao de trade-offs\n   - Capacidade de gerar recomendacoes acionaveis\n\n4. Experiencia de uso\n   - Facilidade de configurar uma pesquisa\n   - Clareza da interface\n   - Velocidade de resposta\n   - Controle do usuario sobre escopo, fontes e formato\n\n5. Recursos e integracoes\n   - Exportacao de resultados\n   - Colaboracao\n   - Integracoes com documentos, navegadores, APIs ou ferramentas de trabalho\n   - Personalizacao de prompts, agentes ou fluxos\n\n6. Confiabilidade e governanca\n   - Politicas de privacidade e seguranca\n   - Controles para empresas\n   - Riscos de alucinacao\n   - Transparencia sobre limitacoes\n\n7. Custo-beneficio\n   - Preco\n   - Limites de uso\n   - Diferencas entre planos\n   - Valor entregue para o caso de uso descrito\n\nFormato da resposta:\n\n1. Resumo executivo\n   - Melhor escolha geral\n   - Melhor custo-beneficio\n   - Melhor para usuarios individuais\n   - Melhor para equipes/empresas\n   - Principal risco ou limitacao de cada ferramenta\n\n2. Tabela comparativa\n   Crie uma tabela com:\n   - Ferramenta\n   - Posicionamento principal\n   - Pontos fortes\n   - Pontos fracos\n   - Melhor caso de uso\n   - Preco ou faixa de preco, se disponivel\n   - Nota geral\n\n3. Analise detalhada por ferramenta\n   Para cada ferramenta, inclua:\n   - O que ela faz melhor\n   - Onde ela fica atras das concorrentes\n   - Evidencias encontradas em fontes oficiais\n   - Evidencias encontradas em reviews independentes\n   - Principais limitacoes\n   - Perfil de usuario ideal\n\n4. Matriz de decisao\n   Monte uma matriz com notas de 1 a 5 para cada criterio. Inclua tambem uma nota ponderada final.\n\nUse estes pesos, a menos que o contexto indique outros:\n- Qualidade da pesquisa: 25%\n- Qualidade das fontes: 20%\n- Capacidades analiticas: 15%\n- Experiencia de uso: 10%\n- Recursos e integracoes: 10%\n- Confiabilidade e governanca: 10%\n- Custo-beneficio: 10%\n\n5. Recomendacao final\n   Explique:\n   - Qual ferramenta escolher e por que\n   - Em quais cenarios outra ferramenta seria melhor\n   - Quais perguntas o comprador deve responder antes de decidir\n   - Quais testes praticos fazer antes de contratar\n\n6. Apice de fontes\n   Liste as fontes usadas, separadas por:\n   - Fontes oficiais\n   - Reviews independentes\n   - Avaliacoes de usuarios\n   - Benchmarks ou testes comparativos\n\nRegras de qualidade:\n- Nao faca afirmacoes sem fonte quando a informacao for verificavel.\n- Diferencie fato, inferencia e opiniao.\n- Quando uma informacao nao estiver disponivel, diga claramente \"nao encontrado nas fontes consultadas\".\n- Nao trate material promocional das empresas como prova neutra.\n- Aponte conflitos de interesse ou limitacoes metodologicas em reviews independentes.\n- Se os precos, planos ou recursos tiverem mudado recentemente, destaque a data da fonte.\n- Evite uma conclusao generica. A recomendacao deve depender do caso de uso e dos criterios ponderados.\n```\n"}], "grading": null}], "previous_feedback": {}, "previous_outputs": {}, "benchmark": {"metadata": {"skill_name": "deep-research-prompt-creator", "skill_path": "<path/to/skill>", "executor_model": "<model-name>", "analyzer_model": "<model-name>", "timestamp": "2026-04-28T13:32:29Z", "evals_run": [1, 2, 3], "runs_per_configuration": 3}, "runs": [{"eval_id": 1, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 0.8, "passed": 4, "failed": 1, "total": 5, "time_seconds": 0.0, "tokens": 15537, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "O output declara que o prompt foi otimizado para ChatGPT Deep Research ou equivalente.", "passed": false, "evidence": "Missing one or more required terms: chatgpt deep research, otimizado, deep research"}, {"text": "O prompt inclui escopo Brasil, B2B, atendimento ao cliente e 2026.", "passed": true, "evidence": "Found required terms: brasil, b2b, atendimento ao cliente, 2026"}, {"text": "O prompt exige decomposicao em sub-perguntas antes da pesquisa.", "passed": true, "evidence": "Found required terms: sub-perguntas, decompos"}, {"text": "O prompt inclui politica de evidencia com fontes e tratamento de pontos nao verificados.", "passed": true, "evidence": "Found required terms: fonte, nao verificado"}, {"text": "O prompt define uma saida final com oportunidades, riscos e recomendacoes.", "passed": true, "evidence": "Found required terms: oportunidades, riscos, recomendacoes"}], "notes": ["Timing and token counts unavailable from subagent notifications.", "Outputs were mirrored into run-1/outputs for aggregate_benchmark compatibility."]}, {"eval_id": 2, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 0.8, "passed": 4, "failed": 1, "total": 5, "time_seconds": 0.0, "tokens": 14856, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "O output identifica o modo como fact-checking ou verificacao factual.", "passed": true, "evidence": "Found required terms: fact-checking, verificacao"}, {"text": "O prompt exige extracao de claims atomicas.", "passed": true, "evidence": "Found required terms: claims atomicas, claim atomica"}, {"text": "O prompt exige queries independentes ou agnosticas para verificacao.", "passed": false, "evidence": "Missing one or more required terms: queries, agnost"}, {"text": "O prompt usa os status suportada, contradita, inconclusiva e nao verificavel, ou equivalentes claros.", "passed": true, "evidence": "Found required terms: suportada, contradita, inconclusiva, nao verificavel"}, {"text": "O prompt especifica tabela final com claim, status, evidencia e contradicoes ou observacoes.", "passed": true, "evidence": "Found required terms: tabela, claim, status, evidencia"}], "notes": ["Timing and token counts unavailable from subagent notifications.", "Outputs were mirrored into run-1/outputs for aggregate_benchmark compatibility."]}, {"eval_id": 3, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 0.8, "passed": 4, "failed": 1, "total": 5, "time_seconds": 0.0, "tokens": 12369, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "O output declara que o prompt e generico ou portavel entre plataformas.", "passed": false, "evidence": "Missing one or more required terms: generico, portavel"}, {"text": "O prompt exige definir criterios de comparacao antes de avaliar as ferramentas.", "passed": true, "evidence": "Found required terms: criterios, compar"}, {"text": "O prompt diferencia fontes oficiais de reviews independentes.", "passed": true, "evidence": "Found required terms: fontes oficiais, reviews independentes"}, {"text": "O prompt exige matriz ou tabela comparativa para as 5 ferramentas.", "passed": true, "evidence": "Found required terms: matriz, tabela, 5 ferramentas"}, {"text": "O prompt inclui recomendacao condicional, trade-offs, lacunas ou criterios de decisao.", "passed": true, "evidence": "Found required terms: recomendacao, trade-offs, lacunas"}], "notes": ["Timing and token counts unavailable from subagent notifications.", "Outputs were mirrored into run-1/outputs for aggregate_benchmark compatibility."]}, {"eval_id": 1, "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.2, "passed": 1, "failed": 4, "total": 5, "time_seconds": 0.0, "tokens": 8686, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "O output declara que o prompt foi otimizado para ChatGPT Deep Research ou equivalente.", "passed": false, "evidence": "Missing one or more required terms: chatgpt deep research, otimizado, deep research"}, {"text": "O prompt inclui escopo Brasil, B2B, atendimento ao cliente e 2026.", "passed": true, "evidence": "Found required terms: brasil, b2b, atendimento ao cliente, 2026"}, {"text": "O prompt exige decomposicao em sub-perguntas antes da pesquisa.", "passed": false, "evidence": "Missing one or more required terms: sub-perguntas, decompos"}, {"text": "O prompt inclui politica de evidencia com fontes e tratamento de pontos nao verificados.", "passed": false, "evidence": "Missing one or more required terms: fonte, nao verificado"}, {"text": "O prompt define uma saida final com oportunidades, riscos e recomendacoes.", "passed": false, "evidence": "Missing one or more required terms: oportunidades, riscos, recomendacoes"}], "notes": ["Timing and token counts unavailable from subagent notifications.", "Outputs were mirrored into run-1/outputs for aggregate_benchmark compatibility."]}, {"eval_id": 2, "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.0, "passed": 0, "failed": 5, "total": 5, "time_seconds": 0.0, "tokens": 7462, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "O output identifica o modo como fact-checking ou verificacao factual.", "passed": false, "evidence": "Missing one or more required terms: fact-checking, verificacao"}, {"text": "O prompt exige extracao de claims atomicas.", "passed": false, "evidence": "Missing one or more required terms: claims atomicas, claim atomica"}, {"text": "O prompt exige queries independentes ou agnosticas para verificacao.", "passed": false, "evidence": "Missing one or more required terms: queries, agnost"}, {"text": "O prompt usa os status suportada, contradita, inconclusiva e nao verificavel, ou equivalentes claros.", "passed": false, "evidence": "Missing one or more required terms: suportada, contradita, inconclusiva, nao verificavel"}, {"text": "O prompt especifica tabela final com claim, status, evidencia e contradicoes ou observacoes.", "passed": false, "evidence": "Missing one or more required terms: tabela, claim, status, evidencia"}], "notes": ["Timing and token counts unavailable from subagent notifications.", "Outputs were mirrored into run-1/outputs for aggregate_benchmark compatibility."]}, {"eval_id": 3, "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.6, "passed": 3, "failed": 2, "total": 5, "time_seconds": 0.0, "tokens": 4936, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "O output declara que o prompt e generico ou portavel entre plataformas.", "passed": false, "evidence": "Missing one or more required terms: generico, portavel"}, {"text": "O prompt exige definir criterios de comparacao antes de avaliar as ferramentas.", "passed": true, "evidence": "Found required terms: criterios, compar"}, {"text": "O prompt diferencia fontes oficiais de reviews independentes.", "passed": true, "evidence": "Found required terms: fontes oficiais, reviews independentes"}, {"text": "O prompt exige matriz ou tabela comparativa para as 5 ferramentas.", "passed": true, "evidence": "Found required terms: matriz, tabela, 5 ferramentas"}, {"text": "O prompt inclui recomendacao condicional, trade-offs, lacunas ou criterios de decisao.", "passed": false, "evidence": "Missing one or more required terms: recomendacao, trade-offs, lacunas"}], "notes": ["Timing and token counts unavailable from subagent notifications.", "Outputs were mirrored into run-1/outputs for aggregate_benchmark compatibility."]}], "run_summary": {"with_skill": {"pass_rate": {"mean": 0.8, "stddev": 0.0, "min": 0.8, "max": 0.8}, "time_seconds": {"mean": 0.0, "stddev": 0.0, "min": 0.0, "max": 0.0}, "tokens": {"mean": 14254.0, "stddev": 1667.5908, "min": 12369, "max": 15537}}, "without_skill": {"pass_rate": {"mean": 0.2667, "stddev": 0.3055, "min": 0.0, "max": 0.6}, "time_seconds": {"mean": 0.0, "stddev": 0.0, "min": 0.0, "max": 0.0}, "tokens": {"mean": 7028.0, "stddev": 1912.3002, "min": 4936, "max": 8686}}, "delta": {"pass_rate": "+0.53", "time_seconds": "+0.0", "tokens": "+7226"}}, "notes": []}};
+
+    // ---- State ----
+    let feedbackMap = {};  // run_id -> feedback text
+    let currentIndex = 0;
+    let visitedRuns = new Set();
+
+    // ---- Init ----
+    async function init() {
+      // Load saved feedback from server — but only if this isn't a fresh
+      // iteration (indicated by previous_feedback being present). When
+      // previous feedback exists, the feedback.json on disk is stale from
+      // the prior iteration and should not pre-fill the textareas.
+      const hasPrevious = Object.keys(EMBEDDED_DATA.previous_feedback || {}).length > 0
+        || Object.keys(EMBEDDED_DATA.previous_outputs || {}).length > 0;
+      if (!hasPrevious) {
+        try {
+          const resp = await fetch("/api/feedback");
+          const data = await resp.json();
+          if (data.reviews) {
+            for (const r of data.reviews) feedbackMap[r.run_id] = r.feedback;
+          }
+        } catch { /* first run, no feedback yet */ }
+      }
+
+      document.getElementById("skill-name").textContent = EMBEDDED_DATA.skill_name;
+      showRun(0);
+
+      // Wire up feedback auto-save
+      const textarea = document.getElementById("feedback");
+      let saveTimeout = null;
+      textarea.addEventListener("input", () => {
+        clearTimeout(saveTimeout);
+        document.getElementById("feedback-status").textContent = "";
+        saveTimeout = setTimeout(() => saveCurrentFeedback(), 800);
+      });
+    }
+
+    // ---- Navigation ----
+    function navigate(delta) {
+      const newIndex = currentIndex + delta;
+      if (newIndex >= 0 && newIndex < EMBEDDED_DATA.runs.length) {
+        saveCurrentFeedback();
+        showRun(newIndex);
+      }
+    }
+
+    function updateNavButtons() {
+      document.getElementById("prev-btn").disabled = currentIndex === 0;
+      document.getElementById("next-btn").disabled =
+        currentIndex === EMBEDDED_DATA.runs.length - 1;
+    }
+
+    // ---- Show a run ----
+    function showRun(index) {
+      currentIndex = index;
+      const run = EMBEDDED_DATA.runs[index];
+
+      // Progress
+      document.getElementById("progress").textContent =
+        `${index + 1} of ${EMBEDDED_DATA.runs.length}`;
+
+      // Prompt
+      document.getElementById("prompt-text").textContent = run.prompt;
+
+      // Config badge
+      const badge = document.getElementById("config-badge");
+      const configMatch = run.id.match(/(with_skill|without_skill|new_skill|old_skill)/);
+      if (configMatch) {
+        const config = configMatch[1];
+        const isBaseline = config === "without_skill" || config === "old_skill";
+        badge.textContent = config.replace(/_/g, " ");
+        badge.className = "config-badge " + (isBaseline ? "config-baseline" : "config-primary");
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+
+      // Outputs
+      renderOutputs(run);
+
+      // Previous outputs
+      renderPrevOutputs(run);
+
+      // Grades
+      renderGrades(run);
+
+      // Previous feedback
+      const prevFb = (EMBEDDED_DATA.previous_feedback || {})[run.id];
+      const prevEl = document.getElementById("prev-feedback");
+      if (prevFb) {
+        document.getElementById("prev-feedback-text").textContent = prevFb;
+        prevEl.style.display = "block";
+      } else {
+        prevEl.style.display = "none";
+      }
+
+      // Feedback
+      document.getElementById("feedback").value = feedbackMap[run.id] || "";
+      document.getElementById("feedback-status").textContent = "";
+
+      updateNavButtons();
+
+      // Track visited runs and promote done button when all visited
+      visitedRuns.add(index);
+      const doneBtn = document.getElementById("done-btn");
+      if (visitedRuns.size >= EMBEDDED_DATA.runs.length) {
+        doneBtn.classList.add("ready");
+      }
+
+      // Scroll main content to top
+      document.querySelector(".main").scrollTop = 0;
+    }
+
+    // ---- Render outputs ----
+    function renderOutputs(run) {
+      const container = document.getElementById("outputs-body");
+      container.innerHTML = "";
+
+      const outputs = run.outputs || [];
+      if (outputs.length === 0) {
+        container.innerHTML = '<div class="empty-state">No output files</div>';
+        return;
+      }
+
+      for (const file of outputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        // Always show file header with download link
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const content = document.createElement("div");
+        content.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          content.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          content.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          content.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(content, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          content.appendChild(a);
+        } else if (file.type === "error") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          pre.style.color = "var(--red)";
+          content.appendChild(pre);
+        }
+
+        fileDiv.appendChild(content);
+        container.appendChild(fileDiv);
+      }
+    }
+
+    // ---- XLSX rendering via SheetJS ----
+    function renderXlsx(container, b64Data) {
+      try {
+        const raw = Uint8Array.from(atob(b64Data), c => c.charCodeAt(0));
+        const wb = XLSX.read(raw, { type: "array" });
+
+        for (let i = 0; i < wb.SheetNames.length; i++) {
+          const sheetName = wb.SheetNames[i];
+          const ws = wb.Sheets[sheetName];
+
+          if (wb.SheetNames.length > 1) {
+            const sheetLabel = document.createElement("div");
+            sheetLabel.style.cssText =
+              "font-weight:600; font-size:0.8rem; color:#b0aea5; margin-top:0.5rem; margin-bottom:0.25rem;";
+            sheetLabel.textContent = "Sheet: " + sheetName;
+            container.appendChild(sheetLabel);
+          }
+
+          const htmlStr = XLSX.utils.sheet_to_html(ws, { editable: false });
+          const wrapper = document.createElement("div");
+          wrapper.innerHTML = htmlStr;
+          container.appendChild(wrapper);
+        }
+      } catch (err) {
+        container.textContent = "Error rendering spreadsheet: " + err.message;
+      }
+    }
+
+    // ---- Grades ----
+    function renderGrades(run) {
+      const section = document.getElementById("grades-section");
+      const content = document.getElementById("grades-content");
+
+      if (!run.grading) {
+        section.style.display = "none";
+        return;
+      }
+
+      const grading = run.grading;
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("grades-arrow").classList.remove("open");
+
+      const summary = grading.summary || {};
+      const expectations = grading.expectations || [];
+
+      let html = '<div style="padding: 1rem;">';
+
+      // Summary line
+      const passRate = summary.pass_rate != null
+        ? Math.round(summary.pass_rate * 100) + "%"
+        : "?";
+      const badgeClass = summary.pass_rate >= 0.8 ? "grade-pass" : summary.pass_rate >= 0.5 ? "" : "grade-fail";
+      html += '<div class="grades-summary">';
+      html += '<span class="grade-badge ' + badgeClass + '">' + passRate + '</span>';
+      html += '<span>' + (summary.passed || 0) + ' passed, ' + (summary.failed || 0) + ' failed of ' + (summary.total || 0) + '</span>';
+      html += '</div>';
+
+      // Assertions list
+      html += '<ul class="assertion-list">';
+      for (const exp of expectations) {
+        const statusClass = exp.passed ? "pass" : "fail";
+        const statusIcon = exp.passed ? "\u2713" : "\u2717";
+        html += '<li class="assertion-item">';
+        html += '<span class="assertion-status ' + statusClass + '">' + statusIcon + '</span>';
+        html += '<span>' + escapeHtml(exp.text) + '</span>';
+        if (exp.evidence) {
+          html += '<div class="assertion-evidence">' + escapeHtml(exp.evidence) + '</div>';
+        }
+        html += '</li>';
+      }
+      html += '</ul>';
+
+      html += '</div>';
+      content.innerHTML = html;
+    }
+
+    function toggleGrades() {
+      const content = document.getElementById("grades-content");
+      const arrow = document.getElementById("grades-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Previous outputs (collapsible) ----
+    function renderPrevOutputs(run) {
+      const section = document.getElementById("prev-outputs-section");
+      const content = document.getElementById("prev-outputs-content");
+      const prevOutputs = (EMBEDDED_DATA.previous_outputs || {})[run.id];
+
+      if (!prevOutputs || prevOutputs.length === 0) {
+        section.style.display = "none";
+        return;
+      }
+
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("prev-outputs-arrow").classList.remove("open");
+
+      // Render the files into the content area
+      content.innerHTML = "";
+      const wrapper = document.createElement("div");
+      wrapper.style.padding = "1rem";
+
+      for (const file of prevOutputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const fc = document.createElement("div");
+        fc.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          fc.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          fc.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          fc.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(fc, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          fc.appendChild(a);
+        }
+
+        fileDiv.appendChild(fc);
+        wrapper.appendChild(fileDiv);
+      }
+
+      content.appendChild(wrapper);
+    }
+
+    function togglePrevOutputs() {
+      const content = document.getElementById("prev-outputs-content");
+      const arrow = document.getElementById("prev-outputs-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Feedback (saved to server -> feedback.json) ----
+    function saveCurrentFeedback() {
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // Build reviews array from map
+      const reviews = [];
+      for (const [run_id, feedback] of Object.entries(feedbackMap)) {
+        if (feedback.trim()) {
+          reviews.push({ run_id, feedback, timestamp: new Date().toISOString() });
+        }
+      }
+
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviews, status: "in_progress" }),
+      }).then(() => {
+        document.getElementById("feedback-status").textContent = "Saved";
+      }).catch(() => {
+        // Static mode or server unavailable — no-op on auto-save,
+        // feedback will be downloaded on final submit
+        document.getElementById("feedback-status").textContent = "Will download on submit";
+      });
+    }
+
+    // ---- Done ----
+    function showDoneDialog() {
+      // Save current textarea to feedbackMap (but don't POST yet)
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // POST once with status: complete — include ALL runs so the model
+      // can distinguish "no feedback" (looks good) from "not reviewed"
+      const reviews = [];
+      const ts = new Date().toISOString();
+      for (const r of EMBEDDED_DATA.runs) {
+        reviews.push({ run_id: r.id, feedback: feedbackMap[r.id] || "", timestamp: ts });
+      }
+      const payload = JSON.stringify({ reviews, status: "complete" }, null, 2);
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      }).then(() => {
+        document.getElementById("done-overlay").classList.add("visible");
+      }).catch(() => {
+        // Server not available (static mode) — download as file
+        const blob = new Blob([payload], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "feedback.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        document.getElementById("done-overlay").classList.add("visible");
+      });
+    }
+
+    function closeDoneDialog() {
+      // Reset status back to in_progress
+      saveCurrentFeedback();
+      document.getElementById("done-overlay").classList.remove("visible");
+    }
+
+    // ---- Toast ----
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("visible");
+      setTimeout(() => toast.classList.remove("visible"), 2000);
+    }
+
+    // ---- Keyboard nav ----
+    document.addEventListener("keydown", (e) => {
+      // Don't capture when typing in textarea
+      if (e.target.tagName === "TEXTAREA") return;
+
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        navigate(-1);
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        navigate(1);
+      }
+    });
+
+    // ---- Util ----
+    function getDownloadUri(file) {
+      if (file.data_uri) return file.data_uri;
+      if (file.data_b64) return "data:application/octet-stream;base64," + file.data_b64;
+      if (file.type === "text") return "data:text/plain;charset=utf-8," + encodeURIComponent(file.content);
+      return "#";
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ---- View switching ----
+    function switchView(view) {
+      document.querySelectorAll(".view-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+      document.querySelector(`[onclick="switchView('${view}')"]`).classList.add("active");
+      document.getElementById("panel-" + view).classList.add("active");
+    }
+
+    // ---- Benchmark rendering ----
+    function renderBenchmark() {
+      const data = EMBEDDED_DATA.benchmark;
+      if (!data) return;
+
+      // Show the tabs
+      document.getElementById("view-tabs").style.display = "flex";
+
+      const container = document.getElementById("benchmark-content");
+      const summary = data.run_summary || {};
+      const metadata = data.metadata || {};
+      const notes = data.notes || [];
+
+      let html = "";
+
+      // Header
+      html += "<h2 style='font-family: Poppins, sans-serif; margin-bottom: 0.5rem;'>Benchmark Results</h2>";
+      html += "<p style='color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;'>";
+      if (metadata.skill_name) html += "<strong>" + escapeHtml(metadata.skill_name) + "</strong> &mdash; ";
+      if (metadata.timestamp) html += metadata.timestamp + " &mdash; ";
+      if (metadata.evals_run) html += "Evals: " + metadata.evals_run.join(", ") + " &mdash; ";
+      html += (metadata.runs_per_configuration || "?") + " runs per configuration";
+      html += "</p>";
+
+      // Summary table
+      html += '<table class="benchmark-table">';
+
+      function fmtStat(stat, pct) {
+        if (!stat) return "—";
+        const suffix = pct ? "%" : "";
+        const m = pct ? (stat.mean * 100).toFixed(0) : stat.mean.toFixed(1);
+        const s = pct ? (stat.stddev * 100).toFixed(0) : stat.stddev.toFixed(1);
+        return m + suffix + " ± " + s + suffix;
+      }
+
+      function deltaClass(val) {
+        if (!val) return "";
+        const n = parseFloat(val);
+        if (n > 0) return "benchmark-delta-positive";
+        if (n < 0) return "benchmark-delta-negative";
+        return "";
+      }
+
+      // Discover config names dynamically (everything except "delta")
+      const configs = Object.keys(summary).filter(k => k !== "delta");
+      const configA = configs[0] || "config_a";
+      const configB = configs[1] || "config_b";
+      const labelA = configA.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const labelB = configB.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const a = summary[configA] || {};
+      const b = summary[configB] || {};
+      const delta = summary.delta || {};
+
+      html += "<thead><tr><th>Metric</th><th>" + escapeHtml(labelA) + "</th><th>" + escapeHtml(labelB) + "</th><th>Delta</th></tr></thead>";
+      html += "<tbody>";
+
+      html += "<tr><td><strong>Pass Rate</strong></td>";
+      html += "<td>" + fmtStat(a.pass_rate, true) + "</td>";
+      html += "<td>" + fmtStat(b.pass_rate, true) + "</td>";
+      html += '<td class="' + deltaClass(delta.pass_rate) + '">' + (delta.pass_rate || "—") + "</td></tr>";
+
+      // Time (only show row if data exists)
+      if (a.time_seconds || b.time_seconds) {
+        html += "<tr><td><strong>Time (s)</strong></td>";
+        html += "<td>" + fmtStat(a.time_seconds, false) + "</td>";
+        html += "<td>" + fmtStat(b.time_seconds, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.time_seconds) + '">' + (delta.time_seconds ? delta.time_seconds + "s" : "—") + "</td></tr>";
+      }
+
+      // Tokens (only show row if data exists)
+      if (a.tokens || b.tokens) {
+        html += "<tr><td><strong>Tokens</strong></td>";
+        html += "<td>" + fmtStat(a.tokens, false) + "</td>";
+        html += "<td>" + fmtStat(b.tokens, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.tokens) + '">' + (delta.tokens || "—") + "</td></tr>";
+      }
+
+      html += "</tbody></table>";
+
+      // Per-eval breakdown (if runs data available)
+      const runs = data.runs || [];
+      if (runs.length > 0) {
+        const evalIds = [...new Set(runs.map(r => r.eval_id))].sort((a, b) => a - b);
+
+        html += "<h3 style='font-family: Poppins, sans-serif; margin-bottom: 0.75rem;'>Per-Eval Breakdown</h3>";
+
+        const hasTime = runs.some(r => r.result && r.result.time_seconds != null);
+        const hasErrors = runs.some(r => r.result && r.result.errors > 0);
+
+        for (const evalId of evalIds) {
+          const evalRuns = runs.filter(r => r.eval_id === evalId);
+          const evalName = evalRuns[0] && evalRuns[0].eval_name ? evalRuns[0].eval_name : "Eval " + evalId;
+
+          html += "<h4 style='font-family: Poppins, sans-serif; margin: 1rem 0 0.5rem; color: var(--text);'>" + escapeHtml(evalName) + "</h4>";
+          html += '<table class="benchmark-table">';
+          html += "<thead><tr><th>Config</th><th>Run</th><th>Pass Rate</th>";
+          if (hasTime) html += "<th>Time (s)</th>";
+          if (hasErrors) html += "<th>Crashes During Execution</th>";
+          html += "</tr></thead>";
+          html += "<tbody>";
+
+          // Group by config and render with average rows
+          const configGroups = [...new Set(evalRuns.map(r => r.configuration))];
+          for (let ci = 0; ci < configGroups.length; ci++) {
+            const config = configGroups[ci];
+            const configRuns = evalRuns.filter(r => r.configuration === config);
+            if (configRuns.length === 0) continue;
+
+            const rowClass = ci === 0 ? "benchmark-row-with" : "benchmark-row-without";
+            const configLabel = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+
+            for (const run of configRuns) {
+              const r = run.result || {};
+              const prClass = r.pass_rate >= 0.8 ? "benchmark-delta-positive" : r.pass_rate < 0.5 ? "benchmark-delta-negative" : "";
+              html += '<tr class="' + rowClass + '">';
+              html += "<td>" + configLabel + "</td>";
+              html += "<td>" + run.run_number + "</td>";
+              html += '<td class="' + prClass + '">' + ((r.pass_rate || 0) * 100).toFixed(0) + "% (" + (r.passed || 0) + "/" + (r.total || 0) + ")</td>";
+              if (hasTime) html += "<td>" + (r.time_seconds != null ? r.time_seconds.toFixed(1) : "—") + "</td>";
+              if (hasErrors) html += "<td>" + (r.errors || 0) + "</td>";
+              html += "</tr>";
+            }
+
+            // Average row
+            const rates = configRuns.map(r => (r.result || {}).pass_rate || 0);
+            const avgRate = rates.reduce((a, b) => a + b, 0) / rates.length;
+            const avgPrClass = avgRate >= 0.8 ? "benchmark-delta-positive" : avgRate < 0.5 ? "benchmark-delta-negative" : "";
+            html += '<tr class="benchmark-row-avg ' + rowClass + '">';
+            html += "<td>" + configLabel + "</td>";
+            html += "<td>Avg</td>";
+            html += '<td class="' + avgPrClass + '">' + (avgRate * 100).toFixed(0) + "%</td>";
+            if (hasTime) {
+              const times = configRuns.map(r => (r.result || {}).time_seconds).filter(t => t != null);
+              html += "<td>" + (times.length ? (times.reduce((a, b) => a + b, 0) / times.length).toFixed(1) : "—") + "</td>";
+            }
+            if (hasErrors) html += "<td></td>";
+            html += "</tr>";
+          }
+          html += "</tbody></table>";
+
+          // Per-assertion detail for this eval
+          const runsWithExpectations = {};
+          for (const config of configGroups) {
+            runsWithExpectations[config] = evalRuns.filter(r => r.configuration === config && r.expectations && r.expectations.length > 0);
+          }
+          const hasAnyExpectations = Object.values(runsWithExpectations).some(runs => runs.length > 0);
+          if (hasAnyExpectations) {
+            // Collect all unique assertion texts across all configs
+            const allAssertions = [];
+            const seen = new Set();
+            for (const config of configGroups) {
+              for (const run of runsWithExpectations[config]) {
+                for (const exp of (run.expectations || [])) {
+                  if (!seen.has(exp.text)) {
+                    seen.add(exp.text);
+                    allAssertions.push(exp.text);
+                  }
+                }
+              }
+            }
+
+            html += '<table class="benchmark-table" style="margin-top: 0.5rem;">';
+            html += "<thead><tr><th>Assertion</th>";
+            for (const config of configGroups) {
+              const label = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+              html += "<th>" + escapeHtml(label) + "</th>";
+            }
+            html += "</tr></thead><tbody>";
+
+            for (const assertionText of allAssertions) {
+              html += "<tr><td>" + escapeHtml(assertionText) + "</td>";
+
+              for (const config of configGroups) {
+                html += "<td>";
+                for (const run of runsWithExpectations[config]) {
+                  const exp = (run.expectations || []).find(e => e.text === assertionText);
+                  if (exp) {
+                    const cls = exp.passed ? "benchmark-delta-positive" : "benchmark-delta-negative";
+                    const icon = exp.passed ? "\u2713" : "\u2717";
+                    html += '<span class="' + cls + '" title="Run ' + run.run_number + ': ' + escapeHtml(exp.evidence || "") + '">' + icon + "</span> ";
+                  } else {
+                    html += "— ";
+                  }
+                }
+                html += "</td>";
+              }
+              html += "</tr>";
+            }
+            html += "</tbody></table>";
+          }
+        }
+      }
+
+      // Notes
+      if (notes.length > 0) {
+        html += '<div class="benchmark-notes">';
+        html += "<h3>Analysis Notes</h3>";
+        html += "<ul>";
+        for (const note of notes) {
+          html += "<li>" + escapeHtml(note) + "</li>";
+        }
+        html += "</ul></div>";
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ---- Start ----
+    init();
+    renderBenchmark();
+  </script>
+</body>
+</html>

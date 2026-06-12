@@ -1,0 +1,23 @@
+{
+  "skill_name": "easypanel-deploy",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Quero fazer deploy do frontend Next.js da Atomica no Easypanel com domínio customizado e auto-deploy a cada push no GitHub. Me ajuda?",
+      "expected_output": "Resposta com arquitetura de App Service + Dockerfile standalone, variáveis HOSTNAME/PORT, passos de conexão GitHub, configuração de domínio/proxy na porta 3000 e ativação do auto-deploy após primeiro deploy manual.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Preciso subir a API Python FastAPI da Atomica no Easypanel junto com o Supabase self-hosted. Qual a arquitetura recomendada e os passos?",
+      "expected_output": "Resposta separando API em App Service (Dockerfile, bind 0.0.0.0:8000) e Supabase em projeto próprio como Compose Service publicado via kong:8000, com ponteiros para templates e checklist.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "O n8n da Atomica vai ficar no Easypanel. Quais variáveis de ambiente e porta preciso configurar? E como conecto com PostgreSQL?",
+      "expected_output": "Resposta com template de n8n (imagem oficial, porta 5678, volume /home/node/.n8n), variáveis WEBHOOK_URL, N8N_PROXY_HOPS=1, N8N_PROTOCOL=https e configuração DB_TYPE=postgresdb com host/porta/database/user/password.",
+      "files": []
+    }
+  ]
+}

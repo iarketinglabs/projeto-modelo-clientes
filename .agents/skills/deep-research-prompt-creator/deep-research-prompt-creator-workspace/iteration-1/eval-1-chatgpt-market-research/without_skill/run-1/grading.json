@@ -1,0 +1,62 @@
+{
+  "expectations": [
+    {
+      "text": "O output declara que o prompt foi otimizado para ChatGPT Deep Research ou equivalente.",
+      "passed": false,
+      "evidence": "Missing one or more required terms: chatgpt deep research, otimizado, deep research"
+    },
+    {
+      "text": "O prompt inclui escopo Brasil, B2B, atendimento ao cliente e 2026.",
+      "passed": true,
+      "evidence": "Found required terms: brasil, b2b, atendimento ao cliente, 2026"
+    },
+    {
+      "text": "O prompt exige decomposicao em sub-perguntas antes da pesquisa.",
+      "passed": false,
+      "evidence": "Missing one or more required terms: sub-perguntas, decompos"
+    },
+    {
+      "text": "O prompt inclui politica de evidencia com fontes e tratamento de pontos nao verificados.",
+      "passed": false,
+      "evidence": "Missing one or more required terms: fonte, nao verificado"
+    },
+    {
+      "text": "O prompt define uma saida final com oportunidades, riscos e recomendacoes.",
+      "passed": false,
+      "evidence": "Missing one or more required terms: oportunidades, riscos, recomendacoes"
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 4,
+    "total": 5,
+    "pass_rate": 0.2
+  },
+  "execution_metrics": {
+    "tool_calls": {},
+    "total_tool_calls": 0,
+    "total_steps": 1,
+    "files_created": [
+      "output.md"
+    ],
+    "errors_encountered": 0,
+    "output_chars": 8686,
+    "transcript_chars": 0
+  },
+  "timing": {
+    "total_tokens": 0,
+    "duration_ms": 0,
+    "total_duration_seconds": 0.0,
+    "note": "Subagent completion notifications in this environment did not include token or duration data."
+  },
+  "claims": [],
+  "user_notes_summary": {
+    "uncertainties": [
+      "Timing and token counts unavailable from subagent notifications."
+    ],
+    "needs_review": [],
+    "workarounds": [
+      "Outputs were mirrored into run-1/outputs for aggregate_benchmark compatibility."
+    ]
+  }
+}

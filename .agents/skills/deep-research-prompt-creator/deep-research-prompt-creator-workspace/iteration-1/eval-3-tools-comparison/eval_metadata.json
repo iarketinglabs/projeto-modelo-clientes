@@ -1,0 +1,12 @@
+{
+  "eval_id": 3,
+  "eval_name": "tools-comparison",
+  "prompt": "Monte um prompt generico para comparar 5 ferramentas de pesquisa profunda usando fontes oficiais, reviews independentes e criterios claros de decisao.",
+  "assertions": [
+    "O output declara que o prompt e generico ou portavel entre plataformas.",
+    "O prompt exige definir criterios de comparacao antes de avaliar as ferramentas.",
+    "O prompt diferencia fontes oficiais de reviews independentes.",
+    "O prompt exige matriz ou tabela comparativa para as 5 ferramentas.",
+    "O prompt inclui recomendacao condicional, trade-offs, lacunas ou criterios de decisao."
+  ]
+}

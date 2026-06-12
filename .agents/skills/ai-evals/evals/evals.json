@@ -1,0 +1,44 @@
+{
+  "skill_name": "ai-evals",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Quero criar um eval para um agente que gera propostas comerciais em JSON. Ele precisa validar formato, schema, regras de negócio e qualidade semântica. Como estruturo isso?",
+      "expected_output": "Plano híbrido de eval com validadores determinísticos (JSON/schema/regras de negócio) + métricas LLM-as-Judge (correctness, clarity, adherence) + rubrica com escala 0-4 e CI gate separando hard fail de soft fail.",
+      "files": [],
+      "expectations": [
+        "O output propõe validação determinística antes do juiz semântico.",
+        "Menciona exemplos concretos de regras de negócio (desconto, canal, aprovação).",
+        "Inclui métricas LLM-as-Judge separadas por critério.",
+        "Define escala de rubrica e saída estruturada (score/label/reason/evidence/violations).",
+        "Menciona CI gate e baseline para regressão."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Preciso detectar alucinação em respostas de um RAG que consulta documentos internos. Qual métrica e workflow usar?",
+      "expected_output": "Diferenciação clara entre faithfulness (RAG, retrieval_context) e hallucination (contexto canônico), escolha de métrica, threshold sugerido e workflow de validação determinística + judge.",
+      "files": [],
+      "expectations": [
+        "O output distingue faithfulness de hallucination.",
+        "Indica métrica específica para RAG (faithfulness/groundedness).",
+        "Menciona contexto canônico para hallucination não-RAG.",
+        "Propõe threshold e calibração humana.",
+        "Sugere decomposição por claim quando possível."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Monte uma rubrica de LLM-as-Judge para avaliar se um agente de atendimento respondeu com empatia, precisão factual e aderência à política da empresa.",
+      "expected_output": "Rubrica com critérios separados (empatia, factualidade, policy), escala explícita 0-4, instruções anti-viés e saída JSON com score, label, reason, evidence e violations.",
+      "files": [],
+      "expectations": [
+        "A rubrica separa empatia, factualidade e aderência à política em métricas distintas.",
+        "Define escala numérica com fronteiras claras.",
+        "Inclui instruções contra verbosidade e inferência sem evidência.",
+        "Especifica saída JSON estruturada.",
+        "Menciona que factualidade pesa mais que estilo em conflito."
+      ]
+    }
+  ]
+}

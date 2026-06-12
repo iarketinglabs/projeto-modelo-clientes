@@ -1,0 +1,44 @@
+{
+  "skill_name": "deep-research-prompt-creator",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Crie um prompt para ChatGPT Deep Research investigar o mercado brasileiro de agentes de IA para atendimento ao cliente B2B em 2026, com foco em oportunidades para uma consultoria.",
+      "expected_output": "Um prompt completo para ChatGPT Deep Research com objetivo, escopo Brasil/B2B/2026, decomposicao em sub-perguntas, politica de fontes, busca iterativa, verificacao de evidencias, tratamento de incerteza e formato final com achados, oportunidades, riscos e recomendacoes.",
+      "files": [],
+      "expectations": [
+        "O output declara que o prompt foi otimizado para ChatGPT Deep Research ou equivalente.",
+        "O prompt inclui escopo Brasil, B2B, atendimento ao cliente e 2026.",
+        "O prompt exige decomposicao em sub-perguntas antes da pesquisa.",
+        "O prompt inclui politica de evidencia com fontes e tratamento de pontos nao verificados.",
+        "O prompt define uma saida final com oportunidades, riscos e recomendacoes."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Preciso de um prompt de fact-checking extremo para verificar as claims de um artigo sobre ROI de automacao com IA. Quero uma tabela final com status por claim.",
+      "expected_output": "Um prompt de fact-checking que manda extrair claims atomicas, formular queries independentes, priorizar fontes confiaveis, classificar cada claim como suportada/contradita/inconclusiva/nao verificavel, registrar evidencias e contradicoes, e entregar tabela final auditavel.",
+      "files": [],
+      "expectations": [
+        "O output identifica o modo como fact-checking ou verificacao factual.",
+        "O prompt exige extracao de claims atomicas.",
+        "O prompt exige queries independentes ou agnosticas para verificacao.",
+        "O prompt usa os status suportada, contradita, inconclusiva e nao verificavel, ou equivalentes claros.",
+        "O prompt especifica tabela final com claim, status, evidencia e contradicoes ou observacoes."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Monte um prompt generico para comparar 5 ferramentas de pesquisa profunda usando fontes oficiais, reviews independentes e criterios claros de decisao.",
+      "expected_output": "Um prompt comparativo portavel que define criterios antes de pesquisar, separa fontes oficiais e independentes, exige matriz comparativa, pesos ou criterios de decisao, politica de evidencia, conflito entre fontes, lacunas, trade-offs e recomendacao condicional.",
+      "files": [],
+      "expectations": [
+        "O output declara que o prompt e generico ou portavel entre plataformas.",
+        "O prompt exige definir criterios de comparacao antes de avaliar as ferramentas.",
+        "O prompt diferencia fontes oficiais de reviews independentes.",
+        "O prompt exige matriz ou tabela comparativa para as 5 ferramentas.",
+        "O prompt inclui recomendacao condicional, trade-offs, lacunas ou criterios de decisao."
+      ]
+    }
+  ]
+}

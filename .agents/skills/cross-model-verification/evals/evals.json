@@ -1,0 +1,23 @@
+{
+  "skill_name": "cross-model-verification",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to compare GPT-5.4, Claude Sonnet 4-6 and DeepSeek-V3.2 on our lead-scoring workflow for the Brazilian market. Can you set up a cross-model verification plan that detects bias by profession, region and gender, and flags critical divergences before production?",
+      "expected_output": "A verification plan with pinned model IDs, stratified slices, deterministic checks, judge panel design, metrics, criticality rules and deliverables.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "We want to reduce vendor lock-in by validating that a secondary LLM can shadow our customer-support classification pipeline. Draft the shadow-mode setup, the criticality criteria and the release checklist.",
+      "expected_output": "A shadow-mode workflow with model comparison topology, green/yellow/red queues, criticality criteria and a release gate checklist.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Two models gave different outputs for a high-risk compliance prompt in Portuguese. One refused and the other answered. How do I judge whether this divergence is critical, and what should I do next?",
+      "expected_output": "A criticality assessment explaining why refusal mismatch is critical, next steps for human review, and pointers to the report template and checklist.",
+      "files": []
+    }
+  ]
+}

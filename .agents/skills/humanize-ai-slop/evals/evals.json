@@ -1,0 +1,23 @@
+{
+  "skill_name": "humanize-ai-slop",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Humanize este texto sobre marketing digital: No cenario atual do marketing digital, as marcas precisam navegar por um ecossistema cada vez mais fragmentado. Ademais, a implementacao de estrategias baseadas em dados representa um diferencial competitivo fundamental para organizacoes que buscam otimizar processos e impulsionar resultados. Dessa forma, e imperativo que liderancas de negocio adotem uma postura proativa em relacao a inovacao tecnologica.",
+      "expected_output": "Texto reescrito com voz propria, sem cliches de IA, mantendo o conteudo sobre marketing baseado em dados mas com tom mais direto, opiniao pessoal implícita, e ritmo natural de quem escreve.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Tira a cara de IA deste texto em ingles: In the ever-evolving landscape of modern productivity, professionals must leverage cutting-edge methodologies to unlock their full potential. By fostering a culture of continuous improvement and harnessing data-driven insights, organizations can navigate complexity with confidence and drive sustainable success.",
+      "expected_output": "Texto em ingles reescrito com tom humano, variacao de ritmo, remocao de palavras como leverage/foster/landscape/navigate, e com um ponto de vista claro.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Desrobotiza este email profissional mantendo a formalidade necessaria: Prezado Sr. Silva, Espero que esta mensagem o encontre bem. Gostaria de solicitar uma reuniao para discutirmos os proximos passos do projeto em questao. Acredito que uma conversa sera fundamental para alinharmos expectativas e garantirmos o sucesso das entregas. Fico no aguardo de sua resposta para prosseguirmos.",
+      "expected_output": "Email ainda profissional e educado, mas com ritmo mais natural, menos formulas roboticas (espero que esta mensagem o encontre bem/fico no aguardo), e tom de quem realmente precisa da reuniao.",
+      "files": []
+    }
+  ]
+}

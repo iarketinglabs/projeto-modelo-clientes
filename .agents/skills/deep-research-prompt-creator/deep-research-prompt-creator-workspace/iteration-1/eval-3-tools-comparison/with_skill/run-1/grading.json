@@ -1,0 +1,62 @@
+{
+  "expectations": [
+    {
+      "text": "O output declara que o prompt e generico ou portavel entre plataformas.",
+      "passed": false,
+      "evidence": "Missing one or more required terms: generico, portavel"
+    },
+    {
+      "text": "O prompt exige definir criterios de comparacao antes de avaliar as ferramentas.",
+      "passed": true,
+      "evidence": "Found required terms: criterios, compar"
+    },
+    {
+      "text": "O prompt diferencia fontes oficiais de reviews independentes.",
+      "passed": true,
+      "evidence": "Found required terms: fontes oficiais, reviews independentes"
+    },
+    {
+      "text": "O prompt exige matriz ou tabela comparativa para as 5 ferramentas.",
+      "passed": true,
+      "evidence": "Found required terms: matriz, tabela, 5 ferramentas"
+    },
+    {
+      "text": "O prompt inclui recomendacao condicional, trade-offs, lacunas ou criterios de decisao.",
+      "passed": true,
+      "evidence": "Found required terms: recomendacao, trade-offs, lacunas"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 1,
+    "total": 5,
+    "pass_rate": 0.8
+  },
+  "execution_metrics": {
+    "tool_calls": {},
+    "total_tool_calls": 0,
+    "total_steps": 1,
+    "files_created": [
+      "output.md"
+    ],
+    "errors_encountered": 0,
+    "output_chars": 12369,
+    "transcript_chars": 0
+  },
+  "timing": {
+    "total_tokens": 0,
+    "duration_ms": 0,
+    "total_duration_seconds": 0.0,
+    "note": "Subagent completion notifications in this environment did not include token or duration data."
+  },
+  "claims": [],
+  "user_notes_summary": {
+    "uncertainties": [
+      "Timing and token counts unavailable from subagent notifications."
+    ],
+    "needs_review": [],
+    "workarounds": [
+      "Outputs were mirrored into run-1/outputs for aggregate_benchmark compatibility."
+    ]
+  }
+}

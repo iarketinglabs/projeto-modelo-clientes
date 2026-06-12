@@ -1,0 +1,23 @@
+{
+  "skill_name": "security-audit-lgpd",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Audit a new n8n workflow that receives PII via webhook and calls an LLM to classify support tickets. What LGPD and security controls should I implement before production?",
+      "expected_output": "A structured audit report covering data inventory, legal basis per flow, RIPD trigger, webhook authentication, RLS/least privilege, prompt redaction, retention, human override for automated decisions, threat modeling, and suggested scan commands.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Create a threat model for an AI agent in our Next.js + Supabase app that can read and update CRM records based on user chat.",
+      "expected_output": "A STRIDE/LINDDUN/GenAI threat model with actors, trust boundaries, data flows, tool scopes, memory risks, and mitigations including tool allowlist, read/write separation, human approval for destructive actions, and a kill switch.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "We suspect a Supabase service role key was exposed in a Git commit. What incident response steps and LGPD notifications apply?",
+      "expected_output": "An incident playbook covering containment (rotate key, disable affected webhooks), scope assessment, evidence preservation, classification, ANPD/titular notification within 3 business days if relevant risk, remediation, and post-incident documentation.",
+      "files": []
+    }
+  ]
+}

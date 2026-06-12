@@ -1,0 +1,341 @@
+{
+  "metadata": {
+    "skill_name": "deep-research-prompt-creator",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-04-28T13:32:29Z",
+    "evals_run": [
+      1,
+      2,
+      3
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "time_seconds": 0.0,
+        "tokens": 15537,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "O output declara que o prompt foi otimizado para ChatGPT Deep Research ou equivalente.",
+          "passed": false,
+          "evidence": "Missing one or more required terms: chatgpt deep research, otimizado, deep research"
+        },
+        {
+          "text": "O prompt inclui escopo Brasil, B2B, atendimento ao cliente e 2026.",
+          "passed": true,
+          "evidence": "Found required terms: brasil, b2b, atendimento ao cliente, 2026"
+        },
+        {
+          "text": "O prompt exige decomposicao em sub-perguntas antes da pesquisa.",
+          "passed": true,
+          "evidence": "Found required terms: sub-perguntas, decompos"
+        },
+        {
+          "text": "O prompt inclui politica de evidencia com fontes e tratamento de pontos nao verificados.",
+          "passed": true,
+          "evidence": "Found required terms: fonte, nao verificado"
+        },
+        {
+          "text": "O prompt define uma saida final com oportunidades, riscos e recomendacoes.",
+          "passed": true,
+          "evidence": "Found required terms: oportunidades, riscos, recomendacoes"
+        }
+      ],
+      "notes": [
+        "Timing and token counts unavailable from subagent notifications.",
+        "Outputs were mirrored into run-1/outputs for aggregate_benchmark compatibility."
+      ]
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "time_seconds": 0.0,
+        "tokens": 14856,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "O output identifica o modo como fact-checking ou verificacao factual.",
+          "passed": true,
+          "evidence": "Found required terms: fact-checking, verificacao"
+        },
+        {
+          "text": "O prompt exige extracao de claims atomicas.",
+          "passed": true,
+          "evidence": "Found required terms: claims atomicas, claim atomica"
+        },
+        {
+          "text": "O prompt exige queries independentes ou agnosticas para verificacao.",
+          "passed": false,
+          "evidence": "Missing one or more required terms: queries, agnost"
+        },
+        {
+          "text": "O prompt usa os status suportada, contradita, inconclusiva e nao verificavel, ou equivalentes claros.",
+          "passed": true,
+          "evidence": "Found required terms: suportada, contradita, inconclusiva, nao verificavel"
+        },
+        {
+          "text": "O prompt especifica tabela final com claim, status, evidencia e contradicoes ou observacoes.",
+          "passed": true,
+          "evidence": "Found required terms: tabela, claim, status, evidencia"
+        }
+      ],
+      "notes": [
+        "Timing and token counts unavailable from subagent notifications.",
+        "Outputs were mirrored into run-1/outputs for aggregate_benchmark compatibility."
+      ]
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "time_seconds": 0.0,
+        "tokens": 12369,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "O output declara que o prompt e generico ou portavel entre plataformas.",
+          "passed": false,
+          "evidence": "Missing one or more required terms: generico, portavel"
+        },
+        {
+          "text": "O prompt exige definir criterios de comparacao antes de avaliar as ferramentas.",
+          "passed": true,
+          "evidence": "Found required terms: criterios, compar"
+        },
+        {
+          "text": "O prompt diferencia fontes oficiais de reviews independentes.",
+          "passed": true,
+          "evidence": "Found required terms: fontes oficiais, reviews independentes"
+        },
+        {
+          "text": "O prompt exige matriz ou tabela comparativa para as 5 ferramentas.",
+          "passed": true,
+          "evidence": "Found required terms: matriz, tabela, 5 ferramentas"
+        },
+        {
+          "text": "O prompt inclui recomendacao condicional, trade-offs, lacunas ou criterios de decisao.",
+          "passed": true,
+          "evidence": "Found required terms: recomendacao, trade-offs, lacunas"
+        }
+      ],
+      "notes": [
+        "Timing and token counts unavailable from subagent notifications.",
+        "Outputs were mirrored into run-1/outputs for aggregate_benchmark compatibility."
+      ]
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.2,
+        "passed": 1,
+        "failed": 4,
+        "total": 5,
+        "time_seconds": 0.0,
+        "tokens": 8686,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "O output declara que o prompt foi otimizado para ChatGPT Deep Research ou equivalente.",
+          "passed": false,
+          "evidence": "Missing one or more required terms: chatgpt deep research, otimizado, deep research"
+        },
+        {
+          "text": "O prompt inclui escopo Brasil, B2B, atendimento ao cliente e 2026.",
+          "passed": true,
+          "evidence": "Found required terms: brasil, b2b, atendimento ao cliente, 2026"
+        },
+        {
+          "text": "O prompt exige decomposicao em sub-perguntas antes da pesquisa.",
+          "passed": false,
+          "evidence": "Missing one or more required terms: sub-perguntas, decompos"
+        },
+        {
+          "text": "O prompt inclui politica de evidencia com fontes e tratamento de pontos nao verificados.",
+          "passed": false,
+          "evidence": "Missing one or more required terms: fonte, nao verificado"
+        },
+        {
+          "text": "O prompt define uma saida final com oportunidades, riscos e recomendacoes.",
+          "passed": false,
+          "evidence": "Missing one or more required terms: oportunidades, riscos, recomendacoes"
+        }
+      ],
+      "notes": [
+        "Timing and token counts unavailable from subagent notifications.",
+        "Outputs were mirrored into run-1/outputs for aggregate_benchmark compatibility."
+      ]
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.0,
+        "passed": 0,
+        "failed": 5,
+        "total": 5,
+        "time_seconds": 0.0,
+        "tokens": 7462,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "O output identifica o modo como fact-checking ou verificacao factual.",
+          "passed": false,
+          "evidence": "Missing one or more required terms: fact-checking, verificacao"
+        },
+        {
+          "text": "O prompt exige extracao de claims atomicas.",
+          "passed": false,
+          "evidence": "Missing one or more required terms: claims atomicas, claim atomica"
+        },
+        {
+          "text": "O prompt exige queries independentes ou agnosticas para verificacao.",
+          "passed": false,
+          "evidence": "Missing one or more required terms: queries, agnost"
+        },
+        {
+          "text": "O prompt usa os status suportada, contradita, inconclusiva e nao verificavel, ou equivalentes claros.",
+          "passed": false,
+          "evidence": "Missing one or more required terms: suportada, contradita, inconclusiva, nao verificavel"
+        },
+        {
+          "text": "O prompt especifica tabela final com claim, status, evidencia e contradicoes ou observacoes.",
+          "passed": false,
+          "evidence": "Missing one or more required terms: tabela, claim, status, evidencia"
+        }
+      ],
+      "notes": [
+        "Timing and token counts unavailable from subagent notifications.",
+        "Outputs were mirrored into run-1/outputs for aggregate_benchmark compatibility."
+      ]
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5,
+        "time_seconds": 0.0,
+        "tokens": 4936,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "O output declara que o prompt e generico ou portavel entre plataformas.",
+          "passed": false,
+          "evidence": "Missing one or more required terms: generico, portavel"
+        },
+        {
+          "text": "O prompt exige definir criterios de comparacao antes de avaliar as ferramentas.",
+          "passed": true,
+          "evidence": "Found required terms: criterios, compar"
+        },
+        {
+          "text": "O prompt diferencia fontes oficiais de reviews independentes.",
+          "passed": true,
+          "evidence": "Found required terms: fontes oficiais, reviews independentes"
+        },
+        {
+          "text": "O prompt exige matriz ou tabela comparativa para as 5 ferramentas.",
+          "passed": true,
+          "evidence": "Found required terms: matriz, tabela, 5 ferramentas"
+        },
+        {
+          "text": "O prompt inclui recomendacao condicional, trade-offs, lacunas ou criterios de decisao.",
+          "passed": false,
+          "evidence": "Missing one or more required terms: recomendacao, trade-offs, lacunas"
+        }
+      ],
+      "notes": [
+        "Timing and token counts unavailable from subagent notifications.",
+        "Outputs were mirrored into run-1/outputs for aggregate_benchmark compatibility."
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.8,
+        "stddev": 0.0,
+        "min": 0.8,
+        "max": 0.8
+      },
+      "time_seconds": {
+        "mean": 0.0,
+        "stddev": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "tokens": {
+        "mean": 14254.0,
+        "stddev": 1667.5908,
+        "min": 12369,
+        "max": 15537
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.2667,
+        "stddev": 0.3055,
+        "min": 0.0,
+        "max": 0.6
+      },
+      "time_seconds": {
+        "mean": 0.0,
+        "stddev": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "tokens": {
+        "mean": 7028.0,
+        "stddev": 1912.3002,
+        "min": 4936,
+        "max": 8686
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.53",
+      "time_seconds": "+0.0",
+      "tokens": "+7226"
+    }
+  },
+  "notes": []
+}

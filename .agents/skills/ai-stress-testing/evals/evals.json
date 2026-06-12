@@ -1,0 +1,23 @@
+{
+  "skill_name": "ai-stress-testing",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Preciso fazer um stress test da API de checkout do nosso projeto Next.js + Python + n8n + Supabase. O objetivo é detectar race condition em duplo clique no botão de finalizar pedido. Quero usar k6. Temos OpenAPI em /docs/openapi.json e SLO de p95 < 500ms. Gera a matriz de cenários e depois o script.",
+      "expected_output": "A skill deve primeiro solicitar ou usar o contexto fornecido para gerar uma matriz de cenários em JSON (incluindo cenário de race condition), depois produzir um script k6 parametrizado com thresholds, checks, tags, Idempotency-Key e handleSummary, além do comando de execução.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Quero adicionar teste de carga no CI para uma jornada crítica de frontend no Next.js: login, preenchimento de formulário e confirmação de pedido. Preciso medir LCP, INP e CLS sob carga. Qual ferramenta devo usar e como fica o workflow do GitHub Actions?",
+      "expected_output": "A skill deve recomendar Artillery + Playwright, explicar por que é adequado para Web Vitals em frontend, e gerar um exemplo de configuração Artillery com fases de carga, engine playwright, extendedMetrics, além de um workflow de CI com gatilhos por ambiente (PR/staging/nightly).",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Estou preparando o deploy de uma release e quero rodar stress test antes. Qual o checklist mínimo que não posso esquecer para stack Next.js + Supabase + n8n?",
+      "expected_output": "A skill deve apresentar o checklist pré-deploy com itens como separação de rotas cacheadas/dinâmicas do Next.js, estratégia de pool do Supabase, n8n em queue mode, Idempotency-Key, pacote OWASP mínimo, thresholds codificados, massa pré-semeada e workflow no CI.",
+      "files": []
+    }
+  ]
+}

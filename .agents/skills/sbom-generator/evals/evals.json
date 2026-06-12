@@ -1,0 +1,23 @@
+{
+  "skill_name": "sbom-generator",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "We need to deliver SBOMs for a Next.js + Python + Docker project to a client. They want both SPDX 2.3 and CycloneDX 1.5. Which tools should we use, and what commands should we run?",
+      "expected_output": "Recommends Syft as the primary generator, npm sbom for Node.js lockfile-based SBOM, and explains the need to resolve Python dependencies in a clean venv or with pip --report before generating. Provides commands pinned to spdx-json@2.3 and cyclonedx-json@1.5, and mentions generating SBOMs for both the repository and the built Docker image.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Create a GitHub Actions workflow that generates SPDX 2.3 and CycloneDX 1.5 SBOMs for our repo and Docker image on every push to main.",
+      "expected_output": "Produces a workflow that checks out the repo, installs Syft, generates repository SBOMs, builds the Docker image, generates image SBOMs, and uploads all four JSON files as versioned artifacts with a retention policy.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "The client asked why we are delivering both sbom.repo.spdx.json and sbom.image.cdx.json. Explain the difference and package the final delivery.",
+      "expected_output": "Explains that the repository SBOM captures declared dependencies while the image SBOM captures what actually ships, including OS packages. Describes a delivery package with source/ and image/ folders, a README, metadata files (checksums, commands, tool versions), and optional extras like dependency snapshots or attestations.",
+      "files": []
+    }
+  ]
+}

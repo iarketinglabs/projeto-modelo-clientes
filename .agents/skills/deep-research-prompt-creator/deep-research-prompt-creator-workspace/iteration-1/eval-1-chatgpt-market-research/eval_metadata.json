@@ -1,0 +1,12 @@
+{
+  "eval_id": 1,
+  "eval_name": "chatgpt-market-research",
+  "prompt": "Crie um prompt para ChatGPT Deep Research investigar o mercado brasileiro de agentes de IA para atendimento ao cliente B2B em 2026, com foco em oportunidades para uma consultoria.",
+  "assertions": [
+    "O output declara que o prompt foi otimizado para ChatGPT Deep Research ou equivalente.",
+    "O prompt inclui escopo Brasil, B2B, atendimento ao cliente e 2026.",
+    "O prompt exige decomposicao em sub-perguntas antes da pesquisa.",
+    "O prompt inclui politica de evidencia com fontes e tratamento de pontos nao verificados.",
+    "O prompt define uma saida final com oportunidades, riscos e recomendacoes."
+  ]
+}

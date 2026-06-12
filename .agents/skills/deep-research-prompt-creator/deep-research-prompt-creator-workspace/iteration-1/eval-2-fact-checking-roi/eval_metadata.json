@@ -1,0 +1,12 @@
+{
+  "eval_id": 2,
+  "eval_name": "fact-checking-roi",
+  "prompt": "Preciso de um prompt de fact-checking extremo para verificar as claims de um artigo sobre ROI de automacao com IA. Quero uma tabela final com status por claim.",
+  "assertions": [
+    "O output identifica o modo como fact-checking ou verificacao factual.",
+    "O prompt exige extracao de claims atomicas.",
+    "O prompt exige queries independentes ou agnosticas para verificacao.",
+    "O prompt usa os status suportada, contradita, inconclusiva e nao verificavel, ou equivalentes claros.",
+    "O prompt especifica tabela final com claim, status, evidencia e contradicoes ou observacoes."
+  ]
+}

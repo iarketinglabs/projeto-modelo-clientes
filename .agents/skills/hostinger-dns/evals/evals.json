@@ -1,0 +1,23 @@
+{
+  "skill_name": "hostinger-dns",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I bought a domain on Hostinger and I have an Easypanel VPS with IP 203.0.113.10. I need to point the root domain and www to the VPS, and later add app and api subdomains. What DNS records should I create in Hostinger, and what do I need to configure in Easypanel?",
+      "expected_output": "The response explains creating an A record for @ pointing to 203.0.113.10, a CNAME for www to the apex domain, and A records for app/api to the same IP. It also explains adding each hostname in Easypanel Domains & Proxy with the correct internal port, opening ports 80/443, and validating with dig/curl.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I added an A record in Hostinger pointing my domain to the Easypanel server, but the SSL certificate is failing to issue. What could be wrong and how do I fix it?",
+      "expected_output": "The response walks through common causes: hostname not resolving to the VPS, port 80 blocked, wrong proxy port in Easypanel, or trying to use HTTP-01 for a wildcard. It gives validation commands and recommends DNS-01 for wildcards.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I want http://www.example.com to redirect to https://example.com. Should I do this with DNS records in Hostinger or somewhere else?",
+      "expected_output": "The response clarifies that DNS resolves names but does not perform HTTP redirects. It recommends configuring the redirect in Hostinger Redirects, Traefik middleware, or the app, while keeping both www and apex resolving via DNS.",
+      "files": []
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+.pnpm-store/
+
+# Build & output
+dist/
+build/
+.next/
+out/
+
+# Temp & scratch
+tmp/
+*.tmp
+*.log
+
+# IDE & editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Docker
+docker-compose.override.yml
+
+# Python
+.venv/
+venv/
+*.egg-info/
+
+# Node
+*.tsbuildinfo

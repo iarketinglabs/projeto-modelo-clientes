@@ -1,0 +1,23 @@
+{
+  "skill_name": "system-prompt-creator",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Crie um system prompt para um agente RAG de pesquisa juridica interna. Ele deve responder com citacoes dos documentos conectados, marcar incerteza quando as fontes nao bastarem e nunca inventar jurisprudencia.",
+      "expected_output": "Um system prompt modular em portugues, pronto para uso, com secoes de identidade, missao, dados/grounding, regras de citacao, guardrails contra alucinacao, formato de saida e cenarios de teste recomendados.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Revise este prompt e deixe ele mais robusto: 'Voce e um assistente muito inteligente da empresa. Ajude todo mundo com qualquer coisa, use nossos documentos quando precisar, seja rapido e nunca diga nao.'",
+      "expected_output": "Um diagnostico dos problemas do prompt original, incluindo escopo amplo demais, conflito de seguranca, ausencia de grounding e formato; depois um prompt revisado com limites claros e testes recomendados.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Preciso de instrucoes para um agente com MCP que pode buscar dados no CRM, criar eventos no calendario e enviar emails. Ele deve pedir aprovacao antes de enviar emails ou alterar eventos existentes.",
+      "expected_output": "Um system prompt ou agent instructions com politica de ferramentas/MCP, condicoes de uso e nao uso, aprovacoes humanas para acoes sensiveis, fallback em falhas, guardrails de privacidade e cenarios de teste.",
+      "files": []
+    }
+  ]
+}
