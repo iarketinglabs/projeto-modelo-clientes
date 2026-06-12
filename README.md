@@ -11,6 +11,7 @@ O **Projeto Modelo** é o ponto de partida de todo novo projeto na Atômica. Ele
 
 - 📂 **Estrutura de diretórios** consistente entre projetos
 - 🧠 **Framework DOE** (Diretivas → Orquestração → Execução)
+- 🏭 **Processo Atômica** de 6 fases + 7 gates para execução de projetos
 - 🤖 **Manifesto do agente** (`agents.md`) — o system prompt que guia agentes de IA como executores autônomos
 - 🔧 **Stack tecnológica default** (Python, Next.js, PostgreSQL, Docker)
 - 🔒 **Regras de segurança e qualidade** inegociáveis
@@ -61,6 +62,8 @@ projeto-modelo/
 ---
 
 ## Como usar como template
+
+> **Importante:** Todo projeto segue o [Processo Atômica](directives/atomica-processos.csv) completo (6 fases + 7 gates). O checklist abaixo cobre apenas o setup técnico inicial.
 
 ### 1. Clone e renomeie
 
@@ -125,6 +128,7 @@ git commit -m "feat: inicialização do projeto a partir do projeto-modelo"
 
 ## Links rápidos
 
+- [Processo Atômica (CSV)](directives/atomica-processos.csv)
 - [Manifesto do Agente](.agents/agents.md)
 - [PRD completo](directives/PRD.md)
 - [Arquitetura](directives/architecture.md)

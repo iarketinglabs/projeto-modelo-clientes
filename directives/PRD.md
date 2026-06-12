@@ -90,9 +90,158 @@ Se um novo projeto não especificar o contrário, estas são as escolhas canôni
 
 ---
 
-## 5. Comportamento Esperado do Agente
+## 5. Processo Atômica de Projetos
 
-### 5.1 Regras de Ouro (Inegociáveis)
+Todo projeto na Atômica segue um processo determinístico de **6 fases + 7 gates**, documentado em `directives/atomica-processos.csv`. Cada fase tem responsáveis, entregáveis e skills definidas.
+
+### 5.1 Papéis e Responsabilidades
+
+| Papel | Lado | Função |
+|-------|------|--------|
+| **Engagement Lead** | Atômica | Relacionamento com cliente, diagnóstico, alinhamento |
+| **Tech Lead** | Atômica | Arquitetura, código, stack, segurança |
+| **Delivery Manager** | Atômica | Cronograma, riscos, prazos |
+| **Decisor** | Cliente | CEO/CFO/Founder — aprova gates, escopo e investimento |
+| **Campeão** | Cliente | Product Owner — valida requisitos, testa aceitação |
+| **Guardião** | Cliente | CISO/TI — aprova arquitetura, segurança e compliance |
+
+### 5.2 Visão Geral das Fases
+
+```
+🚪 Gate -1 ──→ Fase 0 ──→ 🚪 Gate 0 ──→ Fase 1 ──→ 🚪 Gate 1
+   Diagnóstico    (2-5d)      Kickoff       (3-7d)      Arquitetura
+                                                      Aprova stack,
+                                                      segurança, SBOM
+
+Fase 2 ──→ Fase 3 ──→ Fase 4 ──→ 🚪 Gate 2 ──→ Fase 5 ──→ 🚪 Gate 3 ──→ Fase 6
+(2-5d)     (1-16sem)   (3-7d)       MVP           (3-5d)      Entrega      (2-3d)
+Skills     Desenv.     QA &       Aceitação      Segurança,   Final         Retrosp.
+& Base     MVP         Validação   funcional     Deploy &                  Melhoria
+                                             Onboarding                  Contínua
+```
+
+### 5.3 Detalhamento por Fase
+
+#### 🚪 Gate -1: Diagnóstico
+Reunião inicial para explicar os próximos passos e obter informações necessárias para construir o Diagnóstico.
+- **Skills:** brainstorming, business-analyst
+
+#### Fase 0: Diagnóstico (2-5 dias)
+- Firmografia & Tecnografia (tamanho, vertical, tech stack do cliente)
+- Mapeamento da dor operacional (horas perdidas em tarefas manuais)
+- Identificação de gatilhos de urgência
+- Definir métrica de sucesso com baseline numérica (ganho de tempo)
+- Estratégia de delegação Humano vs IA
+- Análise da stack do cliente (própria ou stack Atômica?)
+- Estimativa de prazo do projeto (2 semanas a 4 meses)
+- Identificar ICP negativo / deal breakers
+- **Entregável:** Documento de Diagnóstico
+- **Skills:** brainstorming, business-analyst, xlsx, ai-engineer, business-manager
+
+#### 🚪 Gate 0: Kickoff
+- Alinhamento de expectativas com cliente (Decisor + Campeão + Guardião + Atômica)
+- Definir governança do projeto (3 papéis cliente + 3 papéis Atômica)
+- Aprovação formal do escopo preliminar pelo Decisor
+- **Skills:** pptx, docx, business-manager
+
+#### Fase 1: Arquitetura, SDD & Planejamento (3-7 dias)
+- Importar diretrizes e contexto do cliente (SOPs, planos, apresentações)
+- Spec-Driven Development: escrever especificações orientadas a cenários
+- Criar PRD Agentive (via PRD Engineer + entrevista em 6 levas)
+- Criar Boneco UI/UX (wireframes e protótipos)
+- Definir arquitetura de referência (API-first, MCP, vetores)
+- Decidir stack final (Atômica ou do cliente)
+- Criar agentes do projeto via System Prompt Engineer
+- Checklist de compliance (LGPD + boas práticas IA)
+- Modelagem de ameaças (Zero Trust, privilégio mínimo)
+- Gerar SBOM inicial
+- Setup do projeto: clonar projeto-modelo, renomear, abrir na IDE
+- Configurar Supabase, preencher .env, tokens API
+- Definir RNFs baseline (latência, uptime, backup, observabilidade)
+- **Entregáveis:** PRD.md, Documento de Arquitetura, Wireframes, SBOM v1, Checklist Compliance
+- **Skills:** prd-creator, writing-plans, frontend-design, mcp-builder, system-prompt-creator, security-audit-lgpd, sbom-generator, supabase-expert, rnfs-baseline
+- **Agents:** prd-engineer, system-prompt-engineer
+
+#### 🚪 Gate 1: Arquitetura
+- Aprovação da stack e arquitetura pelo Guardião (CISO)
+- Validação de segurança e compliance
+- Sign-off do SBOM inicial
+
+#### Fase 2: Skills & Base de Conhecimento (2-5 dias)
+- Executar Deep Research por competência (Gemini, Kimi, ChatGPT)
+- Listar competências e habilidades necessárias
+- Criar skills em `.agents/skills/` (skill.md, references/, evals/)
+- Transformar bases de conhecimento em skills
+- Configurar LLM Routing (Large/Medium/Small)
+- **Entregável:** Skills documentadas e testadas
+- **Skills:** deep-research-prompt-creator, skill-creator, write-a-skill, routing-llms
+- **Agents:** deep-research-prompt-engineer, skill-engineer
+
+#### Fase 3: Desenvolvimento MVP (1-16 semanas)
+- Desenvolvimento orientado a testes (TDD onde couber)
+- CI/CD contínuo (commits frequentes, GitHub Actions)
+- Dogfooding condicional (usar internamente se aplicável)
+- Desenvolvimento iterativo baseado no PRD e SDD
+- Construir interface frontend (Next.js)
+- Construir automações (Python / n8n)
+- MVP funcional em `/executions`
+- **Entregável:** MVP funcional cobrindo funcionalidades Must have
+- **Skills:** test-driven-development, cicd-pipeline-github-actions, frontend-design, n8n-automation-builder, subagent-driven-development, verification-before-completion
+- **Agents:** code-reviewer
+
+#### Fase 4: QA & Validação (3-7 dias)
+- Teste de estresse com IA (carga, edge cases, race conditions)
+- Simulações de uso manual humana
+- QA AI: Evals, testes e validações (LLM-as-Judge)
+- Verificação cruzada com modelo alternativo (cross-model)
+- Ajustes e correções pós-QA
+- **Entregáveis:** Relatórios de estresse, QA, cross-model; bugs corrigidos
+- **Skills:** ai-stress-testing, ai-evals, cross-model-verification, systematic-debugging, qa
+
+#### 🚪 Gate 2: MVP
+- Teste de aceitação funcional pelo Campeão (Product Owner)
+- Validação contra baseline de diagnóstico (métrica definida na Fase 0)
+
+#### Fase 5: Segurança, Deploy & Onboarding (3-5 dias)
+- Review de segurança cibernética (vulnerabilidades, OWASP Top 10)
+- Ajustar políticas de segurança (CORS, rate limiting, HTTPS, HSTS, CSP)
+- Gerar SBOM final
+- Criar repositório GitHub (privado, secrets, commit)
+- Configurar pipeline CI/CD (GitHub Actions + Easypanel auto-deploy)
+- Deploy Easypanel + Hostinger (DNS, SSL, triggers)
+- Configurar observabilidade (logs, tracing, alertas, health check)
+- Treinamento do cliente (onboarding)
+- **Entregáveis:** Sistema em produção, SBOM final, cliente treinado
+- **Skills:** security-audit-lgpd, cicd-pipeline-github-actions, easypanel-deploy, hostinger-dns, observabilidade-stack-atomica, client-onboarding-training
+
+#### 🚪 Gate 3: Entrega Final
+- Sign-off final do projeto pelo Decisor (CEO/CFO)
+- Validação final de segurança pelo Guardião (CISO)
+- Entrega de documentação completa (README, PRD, SBOM, Arquitetura, Compliance)
+
+#### Fase 6: Retrospectiva & Melhoria Contínua (2-3 dias)
+- Retrospectiva interna documentada (3 sócios)
+- Skills reutilizáveis → adicionar à biblioteca Atômica
+- Atualizar este processo com lições aprendidas (self-improving)
+- Context engineering / token maxing review
+- Wrap-up do projeto
+- **Skills:** grill-me, brainstorming, skill-creator, context-engineering-2025, handoff
+
+### 5.4 Critérios de Aceitação por Gate
+
+| Gate | Quem aprova | Critério |
+|------|------------|----------|
+| Gate -1 | Engagement Lead | Reunião de diagnóstico agendada |
+| Gate 0 | Decisor | Escopo, prazo e investimento aprovados |
+| Gate 1 | Guardião | Stack, arquitetura e compliance aprovados |
+| Gate 2 | Campeão | MVP funcional validado contra baseline |
+| Gate 3 | Decisor + Guardião | Projeto aceito, documentação entregue |
+
+---
+
+## 6. Comportamento Esperado do Agente
+
+### 6.1 Regras de Ouro (Inegociáveis)
 
 | # | Regra | Motivo |
 |---|-------|--------|
@@ -103,22 +252,22 @@ Se um novo projeto não especificar o contrário, estas são as escolhas canôni
 | R5 | Sempre ler a diretiva relevante antes de executar | Conformidade |
 | R6 | Se falhar, seguir o protocolo de autocorreção antes de escalar | Autonomia |
 
-### 5.2 Ciclo de Execução Padrão
+### 6.2 Ciclo de Execução Padrão
 
 1. Ler a diretiva relevante em `directives/`
 2. Identificar ou criar o script em `executions/`
 3. Executar, capturar logs, validar resultado
-4. Em caso de falha: Protocolo de Autocorreção (§5.3)
+4. Em caso de falha: Protocolo de Autocorreção (§6.3)
 5. Registrar alterações no changelog
 
-### 5.3 Protocolo de Autocorreção
+### 6.3 Protocolo de Autocorreção
 
 1. **Ler** a mensagem de erro completa
 2. **Diagnosticar** a causa raiz (não o sintoma)
 3. **Corrigir** e testar novamente
 4. **Se a lógica de negócio mudou**: atualizar a diretiva (`directives/`) **antes** do código
 
-### 5.4 Definition of Done
+### 6.4 Definition of Done
 
 Uma tarefa só está concluída quando:
 
@@ -129,7 +278,7 @@ Uma tarefa só está concluída quando:
 
 ---
 
-## 6. Requisitos Não-Funcionais
+## 7. Requisitos Não-Funcionais
 
 | Requisito | Especificação |
 |-----------|--------------|
@@ -142,7 +291,7 @@ Uma tarefa só está concluída quando:
 
 ---
 
-## 7. Roadmap e Evolução
+## 8. Roadmap e Evolução
 
 | Fase | Entregável | Status |
 |------|-----------|--------|
@@ -152,16 +301,20 @@ Uma tarefa só está concluída quando:
 
 ---
 
-## 8. Processo de Onboarding de Novos Projetos
+## 9. Processo de Onboarding de Novos Projetos
+
+Todo novo projeto segue o processo completo documentado em `directives/atomica-processos.csv` (resumido na §5). O setup técnico inicial segue o fluxo abaixo:
 
 1. Clonar este repositório como template
 2. Atualizar `REPOSITORY_NAME` no `.env`
-3. Preencher `directives/PRD.md` com o escopo do novo projeto
-4. Preencher `directives/architecture.md` com a arquitetura específica
-5. Ajustar `directives/brand_voice.md` se aplicável
-6. Personalizar `.agents/agents.md` conforme necessidade
-7. Criar scripts em `executions/` conforme demandas surgirem
-8. Primeiro commit com a estrutura adaptada
+3. Seguir **Fase 1** do processo: importar contexto, criar PRD Agentive, definir arquitetura
+4. Preencher `directives/PRD.md` com o escopo do novo projeto
+5. Preencher `directives/architecture.md` com a arquitetura específica
+6. Ajustar `directives/brand_voice.md` se aplicável
+7. Personalizar `.agents/agents.md` conforme necessidade
+8. Criar skills em `.agents/skills/` conforme **Fase 2**
+9. Desenvolver seguindo **Fase 3** (MVP) e validar na **Fase 4** (QA)
+10. Deploy e onboarding seguindo **Fase 5**
 
 ---
 
